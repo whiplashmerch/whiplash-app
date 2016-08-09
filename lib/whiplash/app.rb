@@ -9,6 +9,13 @@ module Whiplash
     class << self
       attr_accessor :customer_id, :shop_id
 
+      def app_request(options = {})
+        connection.send(options[:method],
+                        options[:endpoint],
+                        options[:params],
+                        sanitize_headers(options[:headers]))
+      end
+
       def cache_store
         if ENV["REDIS_HOST"]
           Moneta.new(:Redis, host: ENV["REDIS_HOST"], port: ENV["REDIS_PORT"], PASSWORD: ENV["REDIS_PASSWORD"])
@@ -36,6 +43,16 @@ module Whiplash
         oauth_token = client.client_credentials.get_token(scope: ENV["WHIPLASH_CLIENT_SCOPE"])
         new_token = oauth_token.token
         cache_store["whiplash_api_token"] = new_token
+      end
+
+      def sanitize_headers(headers)
+        if headers
+          {}.tap do |hash|
+            headers.each do |k,v|
+              hash["X-#{k.to_s.upcase.gsub('_','-')}"] = v.to_s
+            end
+          end
+        end
       end
 
       def signature(request)
