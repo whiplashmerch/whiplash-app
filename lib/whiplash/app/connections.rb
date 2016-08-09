@@ -9,6 +9,34 @@ module Whiplash
                         sanitize_headers(options[:headers]))
       end
 
+      def delete(endpoint, params, headers)
+        app_request(method: :delete,
+                    endpoint: endpoint,
+                    params: params,
+                    headers: headers)
+      end
+
+      def get(endpoint, params, headers)
+        app_request(method: :get,
+                    endpoint: endpoint,
+                    params: params,
+                    headers: headers)
+      end
+
+      def post(endpoint, params, headers)
+        app_request(method: :post,
+                    endpoint: endpoint,
+                    params: params,
+                    headers: headers)
+      end
+
+      def put(endpoint, params, headers)
+        app_request(method: :put,
+                    endpoint: endpoint,
+                    params: params,
+                    headers: headers)
+      end
+
       def sanitize_headers(headers)
         if headers
           {}.tap do |hash|
@@ -18,7 +46,7 @@ module Whiplash
           end
         end
       end
-      
+
     end
   end
 end
