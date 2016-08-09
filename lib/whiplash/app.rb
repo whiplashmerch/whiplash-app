@@ -40,9 +40,8 @@ module Whiplash
         cache_store["whiplash_api_token"] = new_token
       end
 
-      def signature(request)
+      def signature(body)
         sha256 = OpenSSL::Digest::SHA256.new
-        body   = request.try(:body).try(:read)
         OpenSSL::HMAC.hexdigest(sha256, ENV["WHIPLASH_CLIENT_SECRET"], body)
       end
 
@@ -52,7 +51,8 @@ module Whiplash
       end
 
       def verified?(request)
-        request.headers["X-WHIPLASH-SIGNATURE"] == signature(request)
+        body = request.try(:body).try(:read)
+        request.headers["X-WHIPLASH-SIGNATURE"] == signature(body)
       end
     end
   end
