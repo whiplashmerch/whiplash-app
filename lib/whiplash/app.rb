@@ -1,3 +1,4 @@
+require "whiplash/app/api_config"
 require "whiplash/app/connections"
 require "whiplash/app/signing"
 require "whiplash/app/version"
@@ -10,6 +11,7 @@ module Whiplash
   module App
     class << self
       include Whiplash::App::Connections
+      include Whiplash::App::ApiConfig
       include Whiplash::App::Signing
       attr_accessor :customer_id, :shop_id
 
@@ -22,11 +24,11 @@ module Whiplash
       end
 
       def client
-        OAuth2::Client.new(ENV["WHIPLASH_CLIENT_ID"], ENV["WHIPLASH_CLIENT_SECRET"], :site => ENV["WHIPLASH_API_URL"])
+        OAuth2::Client.new(ENV["WHIPLASH_CLIENT_ID"], ENV["WHIPLASH_CLIENT_SECRET"], site: api_url)
       end
 
       def connection
-        out = Faraday.new [ENV["WHIPLASH_API_URL"], "api/v2"].join("/") do |conn|
+        out = Faraday.new [api_url, "api/v2"].join("/") do |conn|
           conn.request :oauth2, token
           conn.request :json
           conn.response :json, :content_type => /\bjson$/
