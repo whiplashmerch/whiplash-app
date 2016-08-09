@@ -11,13 +11,13 @@ module Whiplash
       end
 
       def production_url
-        ENV["WHIPLASH_API_URL"] || "https://whiplashmerch.com"
+        ENV["WHIPLASH_API_URL"] || "https://www.whiplashmerch.com"
       end
 
       def testing_url
         ENV["WHIPLASH_API_URL"] || "https://testing.whiplashmerch.com"
       end
-      
+
     end
   end
 end
