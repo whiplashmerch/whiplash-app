@@ -1,5 +1,6 @@
-require "whiplash/app/version"
 require "whiplash/app/connections"
+require "whiplash/app/signing"
+require "whiplash/app/version"
 require "oauth2"
 require "faraday_middleware"
 require "moneta"
@@ -9,6 +10,7 @@ module Whiplash
   module App
     class << self
       include Whiplash::App::Connections
+      include Whiplash::App::Signing
       attr_accessor :customer_id, :shop_id
 
       def cache_store
@@ -40,19 +42,9 @@ module Whiplash
         cache_store["whiplash_api_token"] = new_token
       end
 
-      def signature(request)
-        sha256 = OpenSSL::Digest::SHA256.new
-        body   = request.try(:body).try(:read)
-        OpenSSL::HMAC.hexdigest(sha256, ENV["WHIPLASH_CLIENT_SECRET"], body)
-      end
-
       def token
         refresh_token! unless cache_store["whiplash_api_token"]
         return cache_store["whiplash_api_token"]
-      end
-
-      def verified?(request)
-        request.headers["X-WHIPLASH-SIGNATURE"] == signature(request)
       end
     end
   end
