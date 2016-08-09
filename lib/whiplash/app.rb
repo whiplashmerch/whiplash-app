@@ -1,7 +1,5 @@
 require "whiplash/app/api_config"
 require "whiplash/app/connections"
-require "whiplash/app/version"
-require "whiplash/app/connections"
 require "whiplash/app/signing"
 require "whiplash/app/version"
 require "oauth2"
