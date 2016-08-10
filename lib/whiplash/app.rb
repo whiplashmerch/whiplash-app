@@ -1,27 +1,21 @@
 require "whiplash/app/api_config"
+require "whiplash/app/caching"
 require "whiplash/app/connections"
 require "whiplash/app/signing"
 require "whiplash/app/version"
 require "oauth2"
 require "faraday_middleware"
-require "moneta"
 
 module Whiplash
 
   module App
     class << self
+      include Whiplash::App::Caching
       include Whiplash::App::Connections
       include Whiplash::App::ApiConfig
       include Whiplash::App::Signing
-      attr_accessor :customer_id, :shop_id
 
-      def cache_store
-        if ENV["REDIS_HOST"]
-          Moneta.new(:Redis, host: ENV["REDIS_HOST"], port: ENV["REDIS_PORT"], PASSWORD: ENV["REDIS_PASSWORD"])
-        else
-          Moneta.new(:File, dir: "tmp", expires: true)
-        end
-      end
+      attr_accessor :customer_id, :shop_id
 
       def client
         OAuth2::Client.new(ENV["WHIPLASH_CLIENT_ID"], ENV["WHIPLASH_CLIENT_SECRET"], site: api_url)
