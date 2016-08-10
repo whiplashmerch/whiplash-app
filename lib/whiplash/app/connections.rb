@@ -3,14 +3,14 @@ module Whiplash
     module Connections
 
       def app_request(options = {})
+        endpoint = [options[:endpoint], options[:params].delete(:id)].join('/') if options[:params][:id]
         connection.send(options[:method],
-                        options[:endpoint],
+                        endpoint,
                         options[:params],
                         sanitize_headers(options[:headers]))
       end
 
       def delete(endpoint, params, headers = nil)
-        endpoint = [endpoint, params.delete(:id)].join('/') if params[:id]
         app_request(method: :delete,
                     endpoint: endpoint,
                     params: params,
@@ -18,7 +18,6 @@ module Whiplash
       end
 
       def get(endpoint, params, headers = nil)
-        endpoint = [endpoint, params.delete(:id)].join('/') if params[:id]
         app_request(method: :get,
                     endpoint: endpoint,
                     params: params,
@@ -26,7 +25,6 @@ module Whiplash
       end
 
       def post(endpoint, params, headers = nil)
-        endpoint = [endpoint, params.delete(:id)].join('/') if params[:id]
         app_request(method: :post,
                     endpoint: endpoint,
                     params: params,
@@ -34,7 +32,6 @@ module Whiplash
       end
 
       def put(endpoint, params, headers = nil)
-        endpoint = [endpoint, params.delete(:id)].join('/') if params[:id]
         app_request(method: :put,
                     endpoint: endpoint,
                     params: params,
