@@ -9,28 +9,32 @@ module Whiplash
                         sanitize_headers(options[:headers]))
       end
 
-      def delete(endpoint, params, headers)
+      def delete(endpoint, params, headers = nil)
+        endpoint = [endpoint, params.delete(:id)].join('/') if params[:id]
         app_request(method: :delete,
                     endpoint: endpoint,
                     params: params,
                     headers: headers)
       end
 
-      def get(endpoint, params, headers)
+      def get(endpoint, params, headers = nil)
+        endpoint = [endpoint, params.delete(:id)].join('/') if params[:id]
         app_request(method: :get,
                     endpoint: endpoint,
                     params: params,
                     headers: headers)
       end
 
-      def post(endpoint, params, headers)
+      def post(endpoint, params, headers = nil)
+        endpoint = [endpoint, params.delete(:id)].join('/') if params[:id]
         app_request(method: :post,
                     endpoint: endpoint,
                     params: params,
                     headers: headers)
       end
 
-      def put(endpoint, params, headers)
+      def put(endpoint, params, headers = nil)
+        endpoint = [endpoint, params.delete(:id)].join('/') if params[:id]
         app_request(method: :put,
                     endpoint: endpoint,
                     params: params,
