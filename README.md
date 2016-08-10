@@ -60,6 +60,18 @@ and verifications are done like so:
 Whiplash::App.verified?(request)
 ```  
 
+###Caching
+`whiplash-app` is Cache agnostic, relying on the `moneta` gem to provide that
+interface.  However, if you intend to specify `REDIS` as your key-value store of
+choice, it's dead simple.  Simply declare the following variables:
+```
+ENV["REDIS_HOST"]
+ENV["REDIS_PORT"]
+ENV["REDIS_PASSWORD"]
+ENV["REDIS_NAMESPACE"]
+```
+If those are provided, `moneta` will use your redis connection and will namespace your cache storage under the redis namespace.  By default, if you do not declare a `REDIS_NAMESPACE` value, the app will default to the `WHIPLASH_CLIENT_ID`.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
