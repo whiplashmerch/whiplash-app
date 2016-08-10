@@ -1,6 +1,7 @@
 require "whiplash/app/api_config"
 require "whiplash/app/caching"
 require "whiplash/app/connections"
+require "whiplash/app/finder_methods"
 require "whiplash/app/signing"
 require "whiplash/app/version"
 require "oauth2"
@@ -10,9 +11,10 @@ module Whiplash
 
   module App
     class << self
+      include Whiplash::App::ApiConfig
       include Whiplash::App::Caching
       include Whiplash::App::Connections
-      include Whiplash::App::ApiConfig
+      include Whiplash::App::FinderMethods
       include Whiplash::App::Signing
 
       attr_accessor :customer_id, :shop_id
