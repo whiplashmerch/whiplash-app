@@ -3,7 +3,11 @@ module Whiplash
     module Connections
 
       def app_request(options = {})
-        endpoint = [options[:endpoint], options[:params].delete(:id)].join('/') if options[:params][:id]
+        if options[:params][:id]
+          endpoint = [options[:endpoint], options[:params].delete(:id)].join('/')
+        else
+          endpoint = options[:endpoint]
+        end
         connection.send(options[:method],
                         endpoint,
                         options[:params],
