@@ -1,7 +1,7 @@
-ENV["WHIPLASH_CLIENT_ID"] = "2ef544a861f544e3db2712fe190e41827e6ad2b2179a7b437e965fc34560e91c"
-ENV["WHIPLASH_CLIENT_SECRET"] = "f0682fde92a1f5b3a9424007d249bcc4c2df148132f5e00fa149d5f5a4aafb34"
+ENV["WHIPLASH_CLIENT_ID"] = "f5aff8eb291c5e0cf5646dda976bf2a28788f00900e4e9c3e8933cc2a24c64ef"
+ENV["WHIPLASH_CLIENT_SECRET"] = "de93407ddb52f2812a387f401eb5c3f8233e1b40b4d018762e113bf6334d61ea"
 ENV["WHIPLASH_CLIENT_SCOPE"] = "app_manage"
-ENV["WHIPLASH_API_URL"] = "http://localhost:3001"
+ENV["WHIPLASH_API_URL"] = "https://testing.whiplashmerch.com"
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'whiplash/app'
