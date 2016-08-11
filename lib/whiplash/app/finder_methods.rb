@@ -2,8 +2,8 @@ module Whiplash
   module App
     module FinderMethods
 
-      def find_all(resource, headers = nil)
-        get("#{resource}", {}, headers)
+      def find_all(resource, params = {}, headers = nil)
+        get("#{resource}", params, headers)
       end
 
       def create(resource, params, headers = nil)
