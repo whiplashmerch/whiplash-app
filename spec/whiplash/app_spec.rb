@@ -49,10 +49,25 @@ describe Whiplash::App do
         expect(response.status).to eq 200
       end
     end
+
+    describe "#count" do
+
+      let(:customers) { Whiplash::App.find_all('customers').body }
+
+      subject(:response) { Whiplash::App.count('customers') }
+
+      it "returns an integer" do
+        expect(response).to be_an Integer
+      end
+
+      it "returns the count of the given resource" do
+        expect(response).to eq customers.count
+      end
+    end
   end
 
   describe "POST/PUT/DELETE requests" do
-    let(:customer_id) { Whiplash::App.find_all('customers').body.last["id"] }
+    let(:customer_id) { Whiplash::App.find_all('customers').body.first["id"] }
     let(:response) do
       Whiplash::App.create('items', { sku: "TEST123",title: "Test Item"},
       { customer_id: customer_id })
@@ -79,14 +94,6 @@ describe Whiplash::App do
       end
     end
 
-    describe "#destroy" do
-      it "deletes an item" do
-        response = Whiplash::App.destroy('items', item_id)
-        expect(response.status).to eq 204
-        deleted = Whiplash::App.find('items', item_id)
-        expect(deleted.body).to eq({ "error" => "record could not be found" })
-      end
-    end
   end
 
 end
