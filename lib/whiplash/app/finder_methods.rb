@@ -23,7 +23,7 @@ module Whiplash
       end
 
       def update(resource, id, params = {}, headers = nil)
-        put("#{resource}", { id: id }, params, headers)
+        put("#{resource}", params.merge(id: id), headers)
       end
     end
   end
