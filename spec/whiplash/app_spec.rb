@@ -13,7 +13,7 @@ describe Whiplash::App do
 
   describe "#connection" do
     it "has a faraday connection" do
-      Whiplash::App.stub(:token).and_return("bacon")
+      allow(Whiplash::App).to receive(:token).and_return("bacon")
       expect(Whiplash::App.connection).to be_a Faraday::Connection
     end
   end
