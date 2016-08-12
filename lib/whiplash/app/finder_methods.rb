@@ -3,7 +3,7 @@ module Whiplash
     module FinderMethods
 
       def count(resource, params = {}, headers = nil)
-        get("#{resource}/count", params, headers).body["count"]
+        get("#{resource}/count", params, headers)["count"]
       end
 
       def create(resource, params, headers = nil)
