@@ -42,13 +42,22 @@ Whiplash::App.find('orders', 1)
 Whiplash::App.create('orders', params: {})
 Whiplash::App.update('orders', 1, params: {})
 Whiplash::App.destroy('orders', 1)
+Whiplash::App.count('customers') #unlike other calls, which return Faraday responses, this call returns an integer.
 ```
+
 Additionally, all of these methods are simply wrapper methods around simple `GET/POST/PUT/DELETE` wrappers on Faraday, so if you want to get more granular,
 you can make a call like this:
+
 ```ruby
 Whiplash.get('orders', {}, {})
 ```
-Which will return all orders and roughly correspond to an index call.
+
+Which will return all orders and roughly correspond to an index call. If you need to use `Whiplash::App` for nonRESTful calls, simply drop the full endpoint
+in as your first argument:
+
+```ruby
+Whiplash.get('orders/non_restful_action', {}, {})
+```
 
 ###Signing and Verifying.
 `whiplash-app` supports signing and verifying signatures like so:

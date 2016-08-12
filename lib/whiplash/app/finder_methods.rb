@@ -2,8 +2,8 @@ module Whiplash
   module App
     module FinderMethods
 
-      def find_all(resource, params = {}, headers = nil)
-        get("#{resource}", params, headers)
+      def count(resource, params = {}, headers = nil)
+        get("#{resource}/count", params, headers).body["count"]
       end
 
       def create(resource, params, headers = nil)
@@ -16,6 +16,10 @@ module Whiplash
 
       def find(resource, id, headers = nil)
         get("#{resource}", { id: id }, headers)
+      end
+
+      def find_all(resource, params = {}, headers = nil)
+        get("#{resource}", params, headers)
       end
 
       def update(resource, id, params = {}, headers = nil)
