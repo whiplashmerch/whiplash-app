@@ -35,13 +35,27 @@ mostly baked into the calls, there is a method that allows for getting the app's
 token from the main app: `Whiplash::App.token`.
 
 ###CRUD calls
-Basic crud calls can be performed like so:
+
+The basic gist of these CRUD methods is that they will all follow the same pattern.  If you are performing a collection action, such as `create` or `find`, the pattern is this:
+```
+Whiplash::App.create(resource, params, headers)
+```
+For member actions, such as `show`, or `destroy` methods, the pattern is this:
+```
+Whiplash::App.find(resource, id, headers)
+```
+Finally, for `update` calls, it's a mixture of those:
+```
+Whiplash::App.update(resource, id, params_to_update, headers)
+```
+
+So, basic crud calls can be performed like so:
 ```ruby
-Whiplash::App.find_all('orders', { customer_id: 187 })
+Whiplash::App.find_all('orders', {}, { customer_id: 187 })
 Whiplash::App.find('orders', 1)
-Whiplash::App.create('orders', params: {})
-Whiplash::App.update('orders', 1, params: {})
-Whiplash::App.destroy('orders', 1)
+Whiplash::App.create('orders', { key: "value", key2: "value" }, { customer_id: 187 } )
+Whiplash::App.update('orders', 1, { key: "value"}, { customer_id: 187 } )
+Whiplash::App.destroy('orders', 1, { customer_id: 187 } )
 Whiplash::App.count('customers') #unlike other calls, which return Faraday responses, this call returns an integer.
 ```
 
@@ -51,14 +65,11 @@ you can make a call like this:
 ```ruby
 Whiplash.get('orders', {}, {})
 ```
-
-Which will return all orders and roughly correspond to an index call. If you need to use `Whiplash::App` for nonRESTful calls, simply drop the full endpoint
-in as your first argument:
+Which will return all orders and roughly correspond to an index call. If you need to use `Whiplash::App` for nonRESTful calls, simply drop the full endpoint in as your first argument:
 
 ```ruby
 Whiplash.get('orders/non_restful_action', {}, {})
 ```
-
 ###Signing and Verifying.
 `whiplash-app` supports signing and verifying signatures like so:
 ```ruby
