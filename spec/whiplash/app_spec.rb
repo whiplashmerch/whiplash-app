@@ -22,8 +22,12 @@ describe Whiplash::App do
     describe "#find_all" do
       subject(:response) { Whiplash::App.find_all('customers') }
 
+      it "should return a 200 status" do
+        expect(response.status).to eq 200
+      end
+
       it "returns all of a specified resource" do
-        @customers = response
+        @customers = response.body
         expect(@customers).to be_a Array
       end
     end
@@ -31,20 +35,24 @@ describe Whiplash::App do
     describe "#find" do
       before do
         response = Whiplash::App.find_all('customers')
-        @customer_id = response.first["id"]
+        @customer_id = response.body.first["id"]
       end
 
       subject(:response) { Whiplash::App.find('customers', @customer_id) }
 
+      it "should return a 200 status" do
+        expect(response.status).to eq 200
+      end
+
       it "returns a singular resource" do
-        customer = response
+        customer = response.body
         expect(customer).to be_a Hash
       end
     end
 
     describe "#count" do
 
-      let(:customers) { Whiplash::App.find_all('customers') }
+      let(:customers) { Whiplash::App.find_all('customers').body }
 
       subject(:response) { Whiplash::App.count('customers') }
 
@@ -59,7 +67,7 @@ describe Whiplash::App do
   end
 
   describe "POST/PUT/DELETE requests" do
-    let(:customer_id) { Whiplash::App.find_all('customers').first["id"] }
+    let(:customer_id) { Whiplash::App.find_all('customers').body.first["id"] }
     let(:response) do
       Whiplash::App.create('items', { sku: "TEST123",title: "Test Item"},
       { customer_id: customer_id })
@@ -69,8 +77,12 @@ describe Whiplash::App do
 
     describe "#create" do
 
+      it "should return a 201 status" do
+        expect(response.status).to eq 201
+      end
+
       it "finds the newly created item" do
-        new_item = Whiplash::App.find('items', item_id)
+        new_item = Whiplash::App.find('items', item_id).body.first
         expect(new_item["sku"]).to eq "TEST123"
       end
     end
@@ -78,7 +90,7 @@ describe Whiplash::App do
     describe "#update" do
       it "has an updated sku value" do
         Whiplash::App.update('items', item_id, { sku: "TEST1234" })
-        item = Whiplash::App.find('items', item_id)
+        item = Whiplash::App.find('items', item_id).body.first
         expect(item["sku"]).to eq "TEST1234"
       end
     end

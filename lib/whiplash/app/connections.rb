@@ -11,7 +11,7 @@ module Whiplash
         connection.send(options[:method],
                         endpoint,
                         options[:params],
-                        sanitize_headers(options[:headers])).body
+                        sanitize_headers(options[:headers]))
       end
 
       def delete(endpoint, params = {}, headers = nil)
