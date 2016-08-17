@@ -34,6 +34,13 @@ Once those are set, authentication is handled in app.  While authentication is
 mostly baked into the calls, there is a method that allows for getting the app's
 token from the main app: `Whiplash::App.token`.
 
+### API URL
+In order to set your api url, you can use the following environment URL:
+```
+ENV["WHIPLASH_API_URL"]
+```
+If it isn't set, then the API URL defaults to either `https://testing.whiplashmerch.com` or `https://www.whiplashmerch.com`.
+
 ###CRUD calls
 
 The basic gist of these CRUD methods is that they will all follow the same pattern.  If you are performing a collection action, such as `create` or `find`, the pattern is this:

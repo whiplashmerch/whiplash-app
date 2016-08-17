@@ -72,7 +72,7 @@ describe Whiplash::App do
       Whiplash::App.create('items', { sku: "TEST123",title: "Test Item"},
       { customer_id: customer_id })
     end
-    let(:item_id) { response["id"] }
+    let(:item_id) { response.body["id"] }
 
 
     describe "#create" do
@@ -82,7 +82,7 @@ describe Whiplash::App do
       end
 
       it "finds the newly created item" do
-        new_item = Whiplash::App.find('items', item_id).body.first
+        new_item = Whiplash::App.find('items', item_id).body
         expect(new_item["sku"]).to eq "TEST123"
       end
     end
@@ -90,7 +90,7 @@ describe Whiplash::App do
     describe "#update" do
       it "has an updated sku value" do
         Whiplash::App.update('items', item_id, { sku: "TEST1234" })
-        item = Whiplash::App.find('items', item_id).body.first
+        item = Whiplash::App.find('items', item_id).body
         expect(item["sku"]).to eq "TEST1234"
       end
     end
