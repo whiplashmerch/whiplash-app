@@ -39,24 +39,31 @@ In order to set your api url, you can use the following environment URL:
 ```
 ENV["WHIPLASH_API_URL"]
 ```
-If it isn't set, then the API URL defaults to either `https://testing.whiplashmerch.com` or `https://www.whiplashmerch.com`.
+If it isn't set, then the API URL defaults to either `https://testing.whiplashmerch.com` (test or dev environment) or `https://www.whiplashmerch.com` (prod environment).
 
-###CRUD calls
+###Rails AR type calls
 
-The basic gist of these CRUD methods is that they will all follow the same pattern.  If you are performing a collection action, such as `create` or `find`, the pattern is this:
-```
+In order to make the use of the gem seem more "AR-ish", we've added AR oriented methods that can be used for basic object creation/deletion/updating/viewing. The basic gist of these AR style CRUD methods is that they will all follow the same pattern.  If you are performing a collection action, such as `create` or `find`, the pattern is this:
+
+```ruby
 Whiplash::App.create(resource, params, headers)
 ```
+
 For member actions, such as `show`, or `destroy` methods, the pattern is this:
-```
+
+```ruby
 Whiplash::App.find(resource, id, headers)
+Whiplash::App.destroy(resource, id, headers)
 ```
+
 Finally, for `update` calls, it's a mixture of those:
-```
+
+```ruby
 Whiplash::App.update(resource, id, params_to_update, headers)
 ```
 
-So, basic crud calls can be performed like so:
+So, basic AR style calls can be performed like so:
+
 ```ruby
 Whiplash::App.find_all('orders', {}, { customer_id: 187 })
 Whiplash::App.find('orders', 1)
@@ -66,17 +73,41 @@ Whiplash::App.destroy('orders', 1, { customer_id: 187 } )
 Whiplash::App.count('customers') #unlike other calls, which return Faraday responses, this call returns an integer.
 ```
 
-Additionally, all of these methods are simply wrapper methods around simple `GET/POST/PUT/DELETE` wrappers on Faraday, so if you want to get more granular,
-you can make a call like this:
+###CRUD Wrapper methods
+In reality, all of these methods are simply wrapper methods around simple `GET/POST/PUT/DELETE` wrappers on Faraday, so if you want to get more granular,you can also make calls that simply reference the lower level REST verb:
 
 ```ruby
-Whiplash.get('orders', {}, {})
+Whiplash::App.get('orders', {}, {})
 ```
 Which will return all orders and roughly correspond to an index call. If you need to use `Whiplash::App` for nonRESTful calls, simply drop the full endpoint in as your first argument:
 
 ```ruby
-Whiplash.get('orders/non_restful_action', {}, {})
+Whiplash::App.get('orders/non_restful_action', {}, {})
 ```
+`POST`, `PUT`, and `DELETE` calls can be performed in much the same way:
+```ruby
+Whiplash::App.post(endpoint, params, headers) #POST request to the specified endpoint passing the payload in params
+```
+```ruby
+Whiplash::App.put(endpoint, params, headers) #PUT request to the specified endpoint passing the payload in params
+```
+```ruby
+Whiplash::App.delete(endpoint, params, headers) #DELETE request to the specified endpoint.  Params would probably just be an id.
+```
+
+*IMPORTANT!!!! PLEASE READ!*
+It's best if possible to use the AR style methods.  They hide a lot of issues with the way Faraday handles params.  For example, this should, in theory, work:
+```ruby
+Whiplash::App.get('orders', {id: 1}, {customer_id: 187})  
+```
+BUT, due to the way Faraday handles params, this would not, as expected, route to `orders#show` in the Whiplash App, but would instead route to `orders#index`, so it wouldn't return the expected singular order with an ID of 1, but all orders for that customer.
+
+The gem works best when the base CRUD methods are used ONLY for situations where a singular endpoint can't be reached, such as a cancel action, or uncancel, which would have to be done like so:
+```ruby
+Whiplash::App.post('orders/1/cancel', {}, {customer_id: 187})
+```
+
+
 ###Signing and Verifying.
 `whiplash-app` supports signing and verifying signatures like so:
 ```ruby
