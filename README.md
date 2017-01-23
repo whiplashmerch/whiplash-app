@@ -1,4 +1,4 @@
-# whiplash-app
+# whiplash-app  
 
 The whiplash-app gem allows your Whiplash application to access the Whiplash
 API and perform authentication, signatures and signature verification, and basic
