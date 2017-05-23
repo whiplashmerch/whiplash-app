@@ -6,20 +6,12 @@ require 'whiplash/app/version'
 Gem::Specification.new do |spec|
   spec.name          = "whiplash-app"
   spec.version       = Whiplash::App::VERSION
-  spec.authors       = ["Don Sullivan"]
-  spec.email         = ["apologeticdon@gmail.com"]
+  spec.authors       = ["Don Sullivan, Mark Dickson"]
+  spec.email         = ["developers@getwhiplash.com"]
 
   spec.summary       = "this gem provides connectivity to the Whiplash API for authentication and REST requests."
   spec.description   = "this gem provides connectivity to the Whiplash API for authentication and REST requests."
   spec.homepage      = "https://github.com/whiplashmerch/whiplash-app"
-
-  # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
-  # delete this section to allow pushing this gem to any host.
-  if spec.respond_to?(:metadata)
-    spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
-  else
-    raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
-  end
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
