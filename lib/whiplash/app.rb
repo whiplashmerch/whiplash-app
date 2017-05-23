@@ -25,8 +25,7 @@ module Whiplash
 
       def connection
         out = Faraday.new [api_url, "api/v2"].join("/") do |conn|
-          conn.request :token_type, 'bearer'
-          conn.request :oauth2, token
+          conn.request :oauth2, token, token_type: "bearer"
           conn.request :json
           conn.response :json, :content_type => /\bjson$/
           conn.use :instrumentation
