@@ -15,7 +15,7 @@ module Whiplash
       end
 
       def testing_url
-        ENV["WHIPLASH_API_URL"] || "https://testing.getwhiplash.com"
+        ENV["WHIPLASH_API_URL"] || "https://sandbox.getwhiplash.com"
       end
 
     end
