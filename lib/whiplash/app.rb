@@ -36,7 +36,14 @@ module Whiplash
       end
 
       def token=(oauth_token)
-        oauth_token = OAuth2::AccessToken.from_hash(client, oauth_token) unless oauth_token.is_a?(OAuth2::AccessToken)
+        unless oauth_token.is_a?(OAuth2::AccessToken)
+          oauth_token['expires'] = oauth_token['expires'].to_s # from_hash expects 'true'
+          if oauth_token.has_key?('token')
+            oauth_token['access_token'] = oauth_token['token']
+            oauth_token.delete('token')
+          end
+          oauth_token = OAuth2::AccessToken.from_hash(client, oauth_token)
+        end
         super(oauth_token)
       end
 
