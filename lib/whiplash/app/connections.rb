@@ -1,5 +1,5 @@
 module Whiplash
-  module App
+  class App
     module Connections
 
       def app_request(options = {})
