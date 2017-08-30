@@ -19,7 +19,7 @@ module Whiplash
 
     def initialize(token=nil, options={})
       opts = options.with_indifferent_access
-      @token = format_token(token) if token
+      @token = format_token(token) unless token.nil?
       @customer_id = options[:customer_id]
       @shop_id = options[:shop_id]
     end
@@ -64,6 +64,7 @@ module Whiplash
     private
     def format_token(oauth_token)
       unless oauth_token.is_a?(OAuth2::AccessToken)
+        raise StandardError, "Token must either be a Hash or an OAuth2::AccessToken" unless oauth_token.is_a?(Hash)
         oauth_token['expires'] = oauth_token['expires'].to_s # from_hash expects 'true'
         if oauth_token.has_key?('token')
           oauth_token['access_token'] = oauth_token['token']
