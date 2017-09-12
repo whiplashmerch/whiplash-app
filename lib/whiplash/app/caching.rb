@@ -1,7 +1,7 @@
 require "moneta"
 require "whiplash/app/moneta/namespace"
 module Whiplash
-  module App
+  class App
     module Caching
 
       def cache_store

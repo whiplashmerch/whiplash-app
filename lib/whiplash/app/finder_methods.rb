@@ -1,5 +1,5 @@
 module Whiplash
-  module App
+  class App
     module FinderMethods
 
       def count(resource, params = {}, headers = nil)

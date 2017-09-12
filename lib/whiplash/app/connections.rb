@@ -1,5 +1,5 @@
 module Whiplash
-  module App
+  class App
     module Connections
 
       def app_request(options = {})
@@ -8,6 +8,9 @@ module Whiplash
         else
           endpoint = options[:endpoint]
         end
+        options[:headers] ||= {}
+        options[:headers][:customer_id] ||= customer_id if customer_id
+        options[:headers][:shop_id] ||= shop_id if shop_id
         connection.send(options[:method],
                         endpoint,
                         options[:params],
