@@ -23,6 +23,7 @@ Or install it yourself as:
 ## Usage
 
 **NOTE: 0.4.0 introduces a breaking change and is NOT backward compatible with previous versions.**
+
 To upgrade from < 0.4.0, you need to make two small changes:
 1. `Whiplash::App` must now be instantiated.
 2. Tokens are **not** automatically refreshed
@@ -41,7 +42,7 @@ api.token # Confirm you've got a token
 api.refresh_token! if api.token_expired?
 ```
 
-###Authentication
+### Authentication
 In order to authenticate, make sure the following `ENV` vars are set:
 
 ```ruby
