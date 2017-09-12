@@ -13,7 +13,7 @@ module Whiplash
     include Whiplash::App::Caching
     include Whiplash::App::Connections
     include Whiplash::App::FinderMethods
-    include Whiplash::App::Signing
+    extend Whiplash::App::Signing
 
     attr_accessor :customer_id, :shop_id, :token
 
@@ -40,7 +40,7 @@ module Whiplash
     end
 
     def token=(oauth_token)
-      super(format_token(oauth_token))
+      instance_variable_set("@token", format_token(oauth_token))
     end
 
     def refresh_token!
@@ -48,10 +48,10 @@ module Whiplash
         access_token = client.client_credentials.get_token(scope: ENV["WHIPLASH_CLIENT_SCOPE"])
         new_token = access_token.to_hash
         cache_store["whiplash_api_token"] = new_token
-        access_token
       else
-        token.refresh!
+        access_token = token.refresh!
       end
+      self.token = access_token
     end
 
     def token_expired?

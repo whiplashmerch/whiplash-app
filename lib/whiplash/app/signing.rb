@@ -1,11 +1,6 @@
 module Whiplash
   class App
     module Signing
-
-      def request_body(body)
-        body.blank? ? ENV["WHIPLASH_CLIENT_ID"] : body
-      end
-
       def signature(body)
         sha256 = OpenSSL::Digest::SHA256.new
         OpenSSL::HMAC.hexdigest(sha256,
@@ -17,6 +12,11 @@ module Whiplash
         request.headers["X-WHIPLASH-SIGNATURE"] == signature(body)
       end
 
+      private
+
+      def request_body(body)
+        body.blank? ? ENV["WHIPLASH_CLIENT_ID"] : body
+      end
     end
   end
 end
