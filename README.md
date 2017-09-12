@@ -77,7 +77,7 @@ In order to set your api url, you can use the following environment URL:
 ```
 ENV["WHIPLASH_API_URL"]
 ```
-If it isn't set, then the API URL defaults to either `https://testing.whiplashmerch.com` (test or dev environment) or `https://www.whiplashmerch.com` (prod environment).
+If it isn't set, then the API URL defaults to either `https://sandbox.getwhiplash.com` (test or dev environment) or `https://www.getwhiplash.com` (prod environment).
 
 ### Sending Customer ID and Shop ID headers
 You can send the headers in `headers` array, like `{customer_id: 123, shop_id: 111}`.
