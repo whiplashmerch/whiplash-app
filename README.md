@@ -22,6 +22,25 @@ Or install it yourself as:
 
 ## Usage
 
+**NOTE: 0.4.0 introduces a breaking change and is NOT backward compatible with previous versions.**
+To upgrade from < 0.4.0, you need to make two small changes:
+1. `Whiplash::App` must now be instantiated.
+2. Tokens are **not** automatically refreshed
+
+Before:
+```ruby
+api = Whiplash::App
+```
+
+After:
+```ruby
+api = Whiplash::App.new
+api.refresh_token! # Since you don't have one yet
+api.token # Confirm you've got a token
+. . .
+api.refresh_token! if api.token_expired?
+```
+
 ###Authentication
 In order to authenticate, make sure the following `ENV` vars are set:
 
@@ -38,18 +57,18 @@ You can authenticate using Oauth Client Credentials (i.e. auth an entire app).
 You probably want this for apps that work offline, _on behalf_ of users or customers, or that don't work at the user/customer-level at all.
 
 ```ruby
-  api = Whiplash::App.new
-  api.refresh_token! # Since you don't have one yet
-  api.token # Confirm you've got a token
+api = Whiplash::App.new
+api.refresh_token! # Since you don't have one yet
+api.token # Confirm you've got a token
 ```
 
 ### Oauth Authorization Code
 You can also authenticate using Oauth Authorization Code (i.e. auth an individual user). This is most common for user-facing app's with a front end.
 
 ```ruby
-  # Authenticate using Devise Omniauthenticateable strategy; you'll get oauth creds back as a hash
-  api = Whiplash::App.new(oauth_credentials_hash)
-  api.token # Confirm you've got a token
+# Authenticate using Devise Omniauthenticateable strategy; you'll get oauth creds back as a hash
+api = Whiplash::App.new(oauth_credentials_hash)
+api.token # Confirm you've got a token
 ```
 
 ### API URL
@@ -92,14 +111,14 @@ api.find('orders', 1)
 api.create('orders', { key: "value", key2: "value" }, { customer_id: 187 } )
 api.update('orders', 1, { key: "value"}, { customer_id: 187 } )
 api.destroy('orders', 1, { customer_id: 187 } )
-api.count('customers') #unlike other calls, which return Faraday responses, this call returns an integer.
+api.count('customers')
 ```
 
 ### CRUD Wrapper methods
 In reality, all of these methods are simply wrapper methods around simple `GET/POST/PUT/DELETE` wrappers on Faraday, so if you want to get more granular,you can also make calls that simply reference the lower level REST verb:
 
 ```ruby
-api.get('orders', {}, {})
+api.get('orders')
 ```
 Which will return all orders and roughly correspond to an index call. If you need to use `Whiplash::App` for nonRESTful calls, simply drop the full endpoint in as your first argument:
 
@@ -108,27 +127,10 @@ api.get('orders/non_restful_action', {}, {})
 ```
 `POST`, `PUT`, and `DELETE` calls can be performed in much the same way:
 ```ruby
-api.post(endpoint, params, headers) #POST request to the specified endpoint passing the payload in params
+api.post(endpoint, params, headers) # POST request to the specified endpoint passing the payload in params
+api.put(endpoint, params, headers) # PUT request to the specified endpoint passing the payload in params
+api.delete(endpoint, params, headers) # DELETE request to the specified endpoint.  Params would probably just be an id.
 ```
-```ruby
-api.put(endpoint, params, headers) #PUT request to the specified endpoint passing the payload in params
-```
-```ruby
-api.delete(endpoint, params, headers) #DELETE request to the specified endpoint.  Params would probably just be an id.
-```
-
-*IMPORTANT!!!! PLEASE READ!*
-It's best if possible to use the AR style methods.  They hide a lot of issues with the way Faraday handles params.  For example, this should, in theory, work:
-```ruby
-api.get('orders', {id: 1}, {customer_id: 187})  
-```
-BUT, due to the way Faraday handles params, this would not, as expected, route to `orders#show` in the Whiplash App, but would instead route to `orders#index`, so it wouldn't return the expected singular order with an ID of 1, but all orders for that customer.
-
-The gem works best when the base CRUD methods are used ONLY for situations where a singular endpoint can't be reached, such as a cancel action, or uncancel, which would have to be done like so:
-```ruby
-api.post('orders/1/cancel', {}, {customer_id: 187})
-```
-
 
 ### Signing and Verifying.
 `whiplash-app` supports signing and verifying signatures like so:
@@ -141,9 +143,8 @@ Whiplash::App.verified?(request)
 ```  
 
 ### Caching
-`whiplash-app` is Cache agnostic, relying on the `moneta` gem to provide that
-interface.  However, if you intend to specify `REDIS` as your key-value store of
-choice, it's dead simple.  Simply declare the following variables:
+`whiplash-app` is Cache agnostic, relying on the `moneta` gem to provide a local store, if needed.  
+However, if you intend to specify `REDIS` as your key-value store of choice, it's dead simple.  Simply declare the following variables:
 ```
 ENV["REDIS_HOST"]
 ENV["REDIS_PORT"]
@@ -152,7 +153,18 @@ ENV["REDIS_NAMESPACE"]
 ```
 If those are provided, `moneta` will use your redis connection and will namespace your cache storage under the redis namespace.  By default, if you do not declare a `REDIS_NAMESPACE` value, the app will default to the `WHIPLASH_CLIENT_ID`.
 
-For user-facing apps, best practice is to store the `oauth_credentials_hash` in a session variable.
+**For user-facing apps, best practice is to store the `oauth_credentials_hash` in a session variable.**
+
+### Gotchas
+Due to the way Faraday handles params, this would not, as expected, route to `orders#show` in the Whiplash App, but would instead route to `orders#index`, so it wouldn't return the expected singular order with an ID of 1, but all orders for that customer.
+```ruby
+api.get('orders', {id: 1}, {customer_id: 187})  
+```
+Instead, you'd want to do:
+```ruby
+api.get('orders/1', {}, {customer_id: 187})  
+```
+
 
 ## Development
 
