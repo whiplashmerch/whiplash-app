@@ -10,6 +10,7 @@ module Whiplash
         end
         options[:headers] ||= {}
         options[:headers][:customer_id] ||= customer_id if customer_id
+        options[:headers][:real_user_id] ||= real_user_id if real_user_id
         options[:headers][:shop_id] ||= shop_id if shop_id
         connection.send(options[:method],
                         endpoint,

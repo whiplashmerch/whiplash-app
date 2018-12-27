@@ -15,12 +15,13 @@ module Whiplash
     include Whiplash::App::FinderMethods
     extend Whiplash::App::Signing
 
-    attr_accessor :customer_id, :shop_id, :token
+    attr_accessor :customer_id, :real_user_id, :shop_id, :token
 
     def initialize(token=nil, options={})
       opts = options.with_indifferent_access
       @token = format_token(token) unless token.nil?
       @customer_id = options[:customer_id]
+      @real_user_id = options[:real_user_id]
       @shop_id = options[:shop_id]
     end
 
