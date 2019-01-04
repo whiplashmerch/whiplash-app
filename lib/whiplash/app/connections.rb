@@ -10,7 +10,7 @@ module Whiplash
         end
         options[:headers] ||= {}
         options[:headers][:customer_id] ||= customer_id if customer_id
-        options[:headers][:real_user_email] ||= real_user_email if real_user_email
+        options[:headers][:mocked_user_email] ||= mocked_user_email if mocked_user_email
         options[:headers][:shop_id] ||= shop_id if shop_id
         connection.send(options[:method],
                         endpoint,
