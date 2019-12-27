@@ -22,9 +22,8 @@ module Whiplash
       end
 
       def limited_app_request(options={})
-        rate_limit = ENV['WHIPLASH_RATE_LIMIT']
-        return app_request(options) if rate_limit.blank? || !defined?(Sidekiq)
-        limiter = Sidekiq::Limiter.window('whiplash-core', Rails, :second, wait_timeout: 15)
+        return app_request(options) unless defined?(Sidekiq)
+        limiter = Sidekiq::Limiter.window('whiplash-core', ::Whiplash::App::ApiConfig.rate_limit, :second, wait_timeout: 15)
         limiter.within_limit do
           app_request(options)
         end
@@ -94,7 +93,7 @@ module Whiplash
           end
         end
       end
-      
+
       def store_whiplash_error!(error, options={})
         return unless defined?(Appsignal)
         options = options.with_indifferent_access
