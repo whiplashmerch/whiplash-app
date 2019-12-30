@@ -12,13 +12,14 @@ module Whiplash
         options[:headers][:customer_id] ||= customer_id if customer_id
         options[:headers][:shop_id] ||= shop_id if shop_id
 
-        args = {
+        args = [
           options[:method],
           endpoint,
           options[:params],
           sanitize_headers(options[:headers])
-        }
-        connection.send(args)
+        ]
+
+        connection.send(*args)
       end
 
       def app_request(options={})
