@@ -21,18 +21,17 @@ module Whiplash
         connection.send(args)
       end
 
-      def limited_app_request(options={})
-        return app_request(options) unless defined?(Sidekiq)
+      def app_request(options={})
+        return base_app_request(options) unless defined?(Sidekiq)
         limiter = Sidekiq::Limiter.window('whiplash-core', ::Whiplash::App::ApiConfig.rate_limit, :second, wait_timeout: 15)
         limiter.within_limit do
-          app_request(options)
+          base_app_request(options)
         end
       end
 
-      def app_request(options = {})
-        return limited_app_request(options) if options[:raise].blank?
+      def app_request!(options = {})
         begin
-          limited_app_request(options)
+          app_request(options)
         rescue Faraday::ConnectionFailed => e
           case e.message
           when 'end of file reached'
@@ -84,6 +83,34 @@ module Whiplash
                     headers: headers)
       end
 
+      def delete!(endpoint, params = {}, headers = nil)
+        app_request!(method: :delete,
+                    endpoint: endpoint,
+                    params: params,
+                    headers: headers)
+      end
+
+      def get!(endpoint, params = {}, headers = nil)
+        app_request!(method: :get,
+                    endpoint: endpoint,
+                    params: params,
+                    headers: headers)
+      end
+
+      def post!(endpoint, params = {}, headers = nil)
+        app_request!(method: :post,
+                    endpoint: endpoint,
+                    params: params,
+                    headers: headers)
+      end
+
+      def put!(endpoint, params = {}, headers = nil)
+        app_request!(method: :put,
+                    endpoint: endpoint,
+                    params: params,
+                    headers: headers)
+      end
+
       def sanitize_headers(headers)
         if headers
           {}.tap do |hash|
@@ -107,13 +134,13 @@ module Whiplash
       end
 
       def error_codes
-        ProviderError.codes
+        WhiplashApiError.codes
       end
 
       def select_error(status_code)
         unless error_codes.keys.include? status_code
           Rails.logger.info "[Provider] Unknown status code from #{self.class.name}: #{status_code}"
-          return ProviderError::UnknownError
+          return WhiplashApiError::UnknownError
         end
         error_codes[status_code]
       end
