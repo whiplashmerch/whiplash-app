@@ -18,6 +18,10 @@ module Whiplash
         ENV["WHIPLASH_API_URL"] || "https://sandbox.getwhiplash.com"
       end
 
+      def rate_limit
+        ENV['WHIPLASH_RATE_LIMIT'] || 25
+      end
+
     end
   end
 end
