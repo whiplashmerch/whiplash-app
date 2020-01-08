@@ -63,7 +63,7 @@ module Whiplash
 
     def token_expired?
       return token.expired? unless token.blank?
-      return true unless cache_store.has_key?("whiplash_api_token")
+      return true unless cache_store.key?("whiplash_api_token")
       return true if cache_store["whiplash_api_token"].blank?
       false
     end
