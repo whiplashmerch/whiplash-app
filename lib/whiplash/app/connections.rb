@@ -32,7 +32,7 @@ module Whiplash
 
       def app_request!(options = {})
         begin
-          app_request(options)
+          response = app_request(options)
         rescue Faraday::ConnectionFailed => e
           case e.message
           when 'end of file reached'
