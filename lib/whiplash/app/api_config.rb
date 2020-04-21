@@ -19,7 +19,7 @@ module Whiplash
       end
 
       def rate_limit
-        ENV['WHIPLASH_RATE_LIMIT'] || 25
+        (ENV['WHIPLASH_RATE_LIMIT'] || 25).to_i
       end
 
     end
