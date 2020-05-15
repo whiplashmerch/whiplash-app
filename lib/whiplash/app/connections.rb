@@ -53,7 +53,7 @@ module Whiplash
         message = response.body if response.body.is_a? String
         message = response.body.dig('error') if response.body.respond_to?(:dig)
         store_whiplash_error!(response.status)
-        error_response(response.status, 'Whiplash', message)
+        error_response(response.status, message)
       end
 
       def delete(endpoint, params = {}, headers = nil)
