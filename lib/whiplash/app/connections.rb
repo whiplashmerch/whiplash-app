@@ -32,7 +32,12 @@ module Whiplash
 
       def app_request!(options = {})
         begin
-          app_request(options)
+          response = app_request(options)
+          return response.body if response.success?
+          message = response.body if response.body.is_a? String
+          message = response.body.dig('error') if response.body.respond_to?(:dig)
+          store_whiplash_error!(response.status)
+          error_response(response.status, message)
         rescue Faraday::ConnectionFailed => e
           case e.message
           when 'end of file reached'
@@ -49,11 +54,6 @@ module Whiplash
             raise ProviderError::InternalServerError, e.message
           end
         end
-        return response.body if response.success?
-        message = response.body if response.body.is_a? String
-        message = response.body.dig('error') if response.body.respond_to?(:dig)
-        store_whiplash_error!(response.status)
-        error_response(response.status, message)
       end
 
       def delete(endpoint, params = {}, headers = nil)
@@ -110,6 +110,37 @@ module Whiplash
                     endpoint: endpoint,
                     params: params,
                     headers: headers)
+      end
+
+      def get_body_or_empty(endpoint, params = {}, headers = nil)
+        response = get(endpoint, params, headers)
+        if !response.success?
+          case response.status
+          when 500
+            Appsignal.send_error(WhiplashApiError::InternalServerError.new(response.body), {raised: false})
+          else
+          end
+
+          case get_context(endpoint)
+          when 'collection'
+            Rails.logger.info "[WhiplashApi] Returned #{response.status}. Returning an empty array..."
+            return []
+          when 'member'
+            Rails.logger.info "[WhiplashApi] Returned #{response.status}. Returning nil..."
+            return nil
+          when 'aggregate'
+            Rails.logger.info "[WhiplashApi] Returned #{response.status}. Returning an empty hash..."
+            return {}
+          end
+        end
+        response.body
+      end
+
+      def get_context(endpoint)
+        parts = endpoint.split('/').compact
+        return 'member' if (parts.last =~ /\d+/).present?
+        return 'aggregate' if parts.include?('aggregate')
+        'collection'
       end
 
       def sanitize_headers(headers)

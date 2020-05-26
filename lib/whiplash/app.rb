@@ -4,6 +4,7 @@ require "whiplash/app/connections"
 require "whiplash/app/finder_methods"
 require "whiplash/app/signing"
 require "whiplash/app/version"
+require "errors/whiplash_api_error"
 require "oauth2"
 require "faraday_middleware"
 
