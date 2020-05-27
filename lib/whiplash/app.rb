@@ -20,9 +20,16 @@ module Whiplash
 
     def initialize(token=nil, options={})
       opts = options.with_indifferent_access
+      token ||= cache_store["whiplash_api_token"]
       @token = format_token(token) unless token.nil?
       @customer_id = options[:customer_id]
       @shop_id = options[:shop_id]
+    end
+
+    def self.whiplash_api_token
+      store = Moneta.new(:Redis, host: ENV["REDIS_HOST"], port: ENV["REDIS_PORT"], password: ENV["REDIS_PASSWORD"], expires: 7200)
+      cache_store = Moneta::Namespace.new store, Whiplash::App::Caching.namespace_value
+      cache_store["whiplash_api_token"]
     end
 
     def client
@@ -57,7 +64,7 @@ module Whiplash
 
     def token_expired?
       return token.expired? unless token.blank?
-      return true unless cache_store.has_key?("whiplash_api_token")
+      return true unless cache_store.key?("whiplash_api_token")
       return true if cache_store["whiplash_api_token"].blank?
       false
     end
