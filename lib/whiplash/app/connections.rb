@@ -25,24 +25,19 @@ module Whiplash
       def app_request(options={})
         return base_app_request(options) unless defined?(Sidekiq)
         limiter = Sidekiq::Limiter.window('whiplash-core', self.rate_limit, :second, wait_timeout: 15)
-        response = nil
         limiter.within_limit do
-          response = base_app_request(options)
+          base_app_request(options)
         end
-        return response
       end
 
       def app_request!(options = {})
         begin
           response = app_request(options)
-<<<<<<< HEAD
-=======
           return response if response.success?
           message = response.body if response.body.is_a? String
           message = response.body.dig('error') if response.body.respond_to?(:dig)
           store_whiplash_error!(response.status)
           error_response(response.status, message)
->>>>>>> master
         rescue Faraday::ConnectionFailed => e
           case e.message
           when 'end of file reached'
