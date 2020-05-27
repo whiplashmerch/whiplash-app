@@ -33,7 +33,7 @@ module Whiplash
       def app_request!(options = {})
         begin
           response = app_request(options)
-          return response.body if response.success?
+          return response if response.success?
           message = response.body if response.body.is_a? String
           message = response.body.dig('error') if response.body.respond_to?(:dig)
           store_whiplash_error!(response.status)
