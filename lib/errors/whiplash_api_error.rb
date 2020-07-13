@@ -65,6 +65,10 @@ class WhiplashApiError < StandardError
   class InternalServerError < WhiplashApiError
   end
 
+  # 502
+  class Timeout < WhiplashApiError
+  end
+
   # 503
   class ServiceUnavailable < WhiplashApiError
   end
@@ -88,6 +92,7 @@ class WhiplashApiError < StandardError
       429 => WhiplashApiError::OverRateLimit,
       495 => WhiplashApiError::SSLError,
       500 => WhiplashApiError::InternalServerError,
+      502 => WhiplashApiError::Timeout,
       503 => WhiplashApiError::ServiceUnavailable
     }
   end
