@@ -11,6 +11,7 @@ module Whiplash
         options[:headers] ||= {}
         options[:headers][:customer_id] ||= customer_id if customer_id
         options[:headers][:shop_id] ||= shop_id if shop_id
+        options[:headers][:version] ||= 2
 
         args = [
           options[:method],
@@ -144,9 +145,12 @@ module Whiplash
       end
 
       def sanitize_headers(headers)
-        if headers
-          {}.tap do |hash|
-            headers.each do |k,v|
+        return unless headers.present?
+        out = {}.tap do |hash|
+          headers.each do |k,v|
+            if k.to_s == 'version'
+              hash['Accept-Version'] = "v#{v}"
+            else
               hash["X-#{k.to_s.upcase.gsub('_','-')}"] = v.to_s
             end
           end
