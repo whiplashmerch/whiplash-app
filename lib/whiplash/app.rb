@@ -24,6 +24,7 @@ module Whiplash
       @token = format_token(token) unless token.nil?
       @customer_id = options[:customer_id]
       @shop_id = options[:shop_id]
+      @api_version = options[:api_version] || 2 # can be 2_1
     end
 
     def self.whiplash_api_token
@@ -36,8 +37,12 @@ module Whiplash
       OAuth2::Client.new(ENV["WHIPLASH_CLIENT_ID"], ENV["WHIPLASH_CLIENT_SECRET"], site: api_url)
     end
 
+    def versioned_api_url
+      "api/v#{@api_version}"
+    end
+
     def connection
-      out = Faraday.new [api_url, "api"].join("/") do |conn|
+      out = Faraday.new [api_url, versioned_api_url].join("/") do |conn|
         conn.request :oauth2, token.token, token_type: "bearer"
         conn.request :json
         conn.response :json, :content_type => /\bjson$/
