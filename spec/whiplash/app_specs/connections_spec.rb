@@ -1,15 +1,14 @@
 require "spec_helper"
 
 describe Whiplash::App::Connections do
-    let(:first_request) { (1..50).to_a }
-    let(:second_request) { (1..10).to_a }
-    let(:whiplash_app) { Whiplash::App.new }
+  let(:first_request) { OpenStruct.new(success?: true, body: (1..50).to_a) }
+  let(:second_request) { OpenStruct.new(success?: true, body: (1..10).to_a) }
+  let(:whiplash_app) { Whiplash::App.new }
 
     before do
         allow_any_instance_of(Whiplash::App).to receive(:token).and_return(double(token: 'access token'))
-        allow_any_instance_of(Faraday::Connection).to receive(:send).and_return(first_request, second_request)
-        allow_any_instance_of(Array).to receive(:success?).and_return(true)
-        allow_any_instance_of(Array).to receive(:body).and_return(first_request, second_request)
+        allow_any_instance_of(Faraday::Connection).to receive(:send).with(:get, "core_url", {:per_page=>50}, {}).and_return(first_request)
+        allow_any_instance_of(Faraday::Connection).to receive(:send).with(:get, "core_url", {:page => 2, :per_page=>50}, {}).and_return(second_request)
     end
 
     context 'GET calls' do
