@@ -138,7 +138,7 @@ module Whiplash
 
       def get_context(endpoint)
         parts = endpoint.split('/').compact
-        return 'member' if (parts.last =~ /\d+/).present?
+        return 'member' unless (parts.last =~ /\d+/).nil?
         return 'aggregate' if parts.include?('aggregate')
         'collection'
       end

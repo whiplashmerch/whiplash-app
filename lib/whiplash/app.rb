@@ -51,7 +51,7 @@ module Whiplash
     end
 
     def refresh_token!
-      if token.blank? # If we're storing locally, grab a new token and cache it
+      if token.nil? || token.empty?
         access_token = client.client_credentials.get_token(scope: ENV["WHIPLASH_CLIENT_SCOPE"])
         new_token = access_token.to_hash
         cache_store["whiplash_api_token"] = new_token
@@ -62,9 +62,10 @@ module Whiplash
     end
 
     def token_expired?
-      return token.expired? unless token.blank?
+      return token.expired? unless token.nil?
       return true unless cache_store.key?("whiplash_api_token")
-      return true if cache_store["whiplash_api_token"].blank?
+      return true if cache_store["whiplash_api_token"].nil?
+      return true if cache_store["whiplash_api_token"].empty?
       false
     end
 

@@ -15,7 +15,11 @@ module Whiplash
       private
 
       def request_body(body)
-        body.blank? ? ENV["WHIPLASH_CLIENT_ID"] : body
+        begin
+          (body.nil? || body.empty?) ? ENV["WHIPLASH_CLIENT_ID"] : body
+        rescue NoMethodError => e
+          ENV["WHIPLASH_CLIENT_ID"]
+        end
       end
     end
   end
