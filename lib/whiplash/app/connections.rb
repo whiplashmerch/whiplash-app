@@ -155,7 +155,7 @@ module Whiplash
 
       def store_whiplash_error!(error, options={})
         return unless defined?(Appsignal)
-        options = options.with_indifferent_access
+        options.transform_keys!(&:to_sym)
         Appsignal.increment_counter(
           "whiplash_error",
           1.0,

@@ -19,7 +19,6 @@ module Whiplash
     attr_accessor :customer_id, :shop_id, :token
 
     def initialize(token=nil, options={})
-      opts = options.with_indifferent_access
       token ||= cache_store["whiplash_api_token"]
       @token = format_token(token) unless token.nil?
       @customer_id = options[:customer_id]
