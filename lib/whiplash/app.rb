@@ -51,11 +51,18 @@ module Whiplash
     end
 
     def refresh_token!
-      if token.nil? || token.empty?
-        access_token = client.client_credentials.get_token(scope: ENV["WHIPLASH_CLIENT_SCOPE"])
-        new_token = access_token.to_hash
-        cache_store["whiplash_api_token"] = new_token
+      case ENV["WHIPLASH_CLIENT_SCOPE"]
+      when /app_(manage|read)/
+        begin
+          access_token = client.client_credentials.get_token(scope: ENV["WHIPLASH_CLIENT_SCOPE"])
+          new_token = access_token.to_hash
+          cache_store["whiplash_api_token"] = new_token
+        rescue URI::InvalidURIError => e
+          raise StandardError, "The provide URL (#{ENV["WHIPLASH_API_URL"]}) is not valid"
+        end
       else
+        raise StandardError, "You must request an access token before you can refresh it" if token.nil?
+        raise StandardError, "Token must either be a Hash or an OAuth2::AccessToken" unless token.is_a?(OAuth2::AccessToken)
         access_token = token.refresh!
       end
       self.token = access_token
@@ -71,15 +78,14 @@ module Whiplash
 
     private
     def format_token(oauth_token)
-      unless oauth_token.is_a?(OAuth2::AccessToken)
-        raise StandardError, "Token must either be a Hash or an OAuth2::AccessToken" unless oauth_token.is_a?(Hash)
-        oauth_token['expires'] = oauth_token['expires'].to_s # from_hash expects 'true'
-        if oauth_token.has_key?('token')
-          oauth_token['access_token'] = oauth_token['token']
-          oauth_token.delete('token')
-        end
-        oauth_token = OAuth2::AccessToken.from_hash(client, oauth_token)
+      return oauth_token if oauth_token.is_a?(OAuth2::AccessToken)
+      raise StandardError, "Token must either be a Hash or an OAuth2::AccessToken" unless oauth_token.is_a?(Hash)
+      oauth_token['expires'] = oauth_token['expires'].to_s # from_hash expects 'true'
+      if oauth_token.has_key?('token')
+        oauth_token['access_token'] = oauth_token['token']
+        oauth_token.delete('token')
       end
+      oauth_token = OAuth2::AccessToken.from_hash(client, oauth_token)
     end
 
   end
