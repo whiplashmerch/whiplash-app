@@ -173,7 +173,7 @@ module Whiplash
       end
 
       def sanitize_headers(headers)
-        return unless headers.present?
+        return if headers.nil? || headers.empty?
         out = {}.tap do |hash|
           headers.each do |k,v|
             if k.to_s == 'version'
