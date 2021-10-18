@@ -7,7 +7,6 @@ require "whiplash/app/version"
 require "errors/whiplash_api_error"
 require "oauth2"
 require "faraday_middleware"
-require "active_support/core_ext/hash/indifferent_access"
 
 module Whiplash
   class App
