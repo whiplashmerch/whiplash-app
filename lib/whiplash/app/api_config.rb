@@ -6,7 +6,7 @@ module Whiplash
         if defined?(Rails)
           %w(development test).include?(Rails.env.to_s) ? testing_url : production_url
         else
-          ENV["WHIPLASH_API_URL"]
+          ENV["WHIPLASH_API_URL"] || ENV["WHIPLASH_API_BASE_URL"]
         end
       end
 
