@@ -9,7 +9,7 @@ module Whiplash
           endpoint = options[:endpoint]
         end
 
-        if options.dig(:options, :version)
+        if options[:options] && options[:options][:version]
           version = options.dig(:options, :version)
         else
           version = "api/v2"
