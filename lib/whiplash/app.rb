@@ -23,8 +23,8 @@ module Whiplash
         OAuth2::Client.new(ENV["WHIPLASH_CLIENT_ID"], ENV["WHIPLASH_CLIENT_SECRET"], site: api_url)
       end
 
-      def connection
-        out = Faraday.new [api_url, "api/v2"].join("/") do |conn|
+      def connection(version = "api/v2")
+        out = Faraday.new [api_url, version].join("/") do |conn|
           conn.request :oauth2, token, token_type: "bearer"
           conn.request :json
           conn.response :json, :content_type => /\bjson$/

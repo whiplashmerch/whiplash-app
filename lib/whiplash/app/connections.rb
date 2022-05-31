@@ -8,38 +8,53 @@ module Whiplash
         else
           endpoint = options[:endpoint]
         end
-        connection.send(options[:method],
-                        endpoint,
-                        options[:params],
-                        sanitize_headers(options[:headers]))
+
+        if options.dig(:options, :version)
+          version = options.dig(:options, :version)
+        else
+          version = "api/v2"
+        end
+
+        connection(version).send(options[:method],
+                                 endpoint,
+                                 options[:params],
+                                 sanitize_headers(options[:headers]))
       end
 
-      def delete(endpoint, params = {}, headers = nil)
+      def delete(endpoint, params = {}, headers = nil, options = {})
         app_request(method: :delete,
                     endpoint: endpoint,
                     params: params,
-                    headers: headers)
+                    headers: headers,
+                    options: options
+                   )
       end
 
-      def get(endpoint, params = {}, headers = nil)
+      def get(endpoint, params = {}, headers = nil, options = {})
         app_request(method: :get,
                     endpoint: endpoint,
                     params: params,
-                    headers: headers)
+                    headers: headers,
+                    options: options
+                   )
       end
 
-      def post(endpoint, params = {}, headers = nil)
+      def post(endpoint, params = {}, headers = nil, options = {})
         app_request(method: :post,
                     endpoint: endpoint,
                     params: params,
-                    headers: headers)
+                    headers: headers,
+                    options: options
+                   )
       end
 
-      def put(endpoint, params = {}, headers = nil)
+      def put(endpoint, params = {}, headers = nil, options = {})
         app_request(method: :put,
                     endpoint: endpoint,
                     params: params,
-                    headers: headers)
+                    headers: headers,
+                    options: options
+                   )
       end
 
       def sanitize_headers(headers)
