@@ -14,11 +14,11 @@ describe Whiplash::App::Connections do
   context 'GET calls' do
     describe '#multi_page_get!' do
       it 'returns an array' do
-          expect(whiplash_app.multi_page_get!('core_url', {}, nil).class).to equal Array
+          expect(whiplash_app.multi_page_get!('core_url', {}, nil).class).to equal Faraday::Response
       end
 
       it 'returns the correct numbers of results' do
-          expect(whiplash_app.multi_page_get!('core_url', {}, nil).size).to equal 60
+          expect(whiplash_app.multi_page_get!('core_url', {}, nil).body.size).to equal 60
       end
     end
   end
