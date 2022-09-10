@@ -63,7 +63,7 @@ module Whiplash
         results = []
         page = 1
         params[:per_page] = PER_PAGE_REQUEST_LIMIT
-        errors = []
+        response = nil
 
         loop do
           partial_results_request = app_request!(
@@ -73,25 +73,31 @@ module Whiplash
             headers: headers
           )
 
-          errors << partial_results_request.status if !partial_results_request.success?
-          
+          if !partial_results_request.success?
+            response = Faraday::Response.new(
+              body: partial_results_request.body,
+              status: partial_results_request.status,
+              method: :get
+            )
+            break
+          end
+
           results << partial_results_request.body
           results.flatten!
-          
+
           page += 1
           params[:page] = page
-          
+
           break if partial_results_request.body.size == 0
           break if partial_results_request.body.size < PER_PAGE_REQUEST_LIMIT
         end
-        
-        status = errors.empty? ? 200 : errors.uniq.first
 
-        Faraday::Response.new(
-          body: results, 
-          status: status,
-          method: :get
+        response ||= Faraday::Response.new(
+          body: results,
+          status: 200,
+          method: :get,
         )
+
       end
 
       def delete(endpoint, params = {}, headers = nil)
