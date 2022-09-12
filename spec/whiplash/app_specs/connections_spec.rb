@@ -13,7 +13,7 @@ describe Whiplash::App::Connections do
 
   context 'GET calls' do
     describe '#multi_page_get!' do
-      it 'returns an array' do
+      it 'returns a Faraday response' do
           expect(whiplash_app.multi_page_get!('core_url', {}, nil).class).to equal Faraday::Response
       end
 
