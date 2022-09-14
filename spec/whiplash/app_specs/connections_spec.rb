@@ -18,6 +18,7 @@ describe Whiplash::App::Connections do
       end
 
       it 'returns an array in the body' do
+        puts whiplash_app.multi_page_get!('core_url', {}, nil)
         expect(whiplash_app.multi_page_get!('core_url', {}, nil).body.class).to equal Array
       end
 
