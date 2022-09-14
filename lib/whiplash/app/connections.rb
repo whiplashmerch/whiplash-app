@@ -103,6 +103,7 @@ module Whiplash
 
         puts response.body
 
+        response
       end
 
       def delete(endpoint, params = {}, headers = nil)
