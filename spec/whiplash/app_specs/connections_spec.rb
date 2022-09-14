@@ -7,8 +7,11 @@ describe Whiplash::App::Connections do
 
   before do
     allow_any_instance_of(Whiplash::App).to receive(:token).and_return(double(token: 'access token'))
-    allow_any_instance_of(Faraday::Connection).to receive(:send).with(:get, "core_url", {:per_page=>50}, {"Accept-Version"=>"v2"}).and_return(first_request)
-    allow_any_instance_of(Faraday::Connection).to receive(:send).with(:get, "core_url", {:page => 2, :per_page=>50}, {"Accept-Version" => "v2"}).and_return(second_request)
+
+    first_req = OpenStruct.new(success?: true, body: (1..50).to_a) 
+    allow_any_instance_of(Faraday::Connection).to receive(:send).with(:get, "core_url", {:per_page=>50}, {"Accept-Version"=>"v2"}).and_return(first_req)
+    second_req = OpenStruct.new(success?: true, body: (1..10).to_a)
+    allow_any_instance_of(Faraday::Connection).to receive(:send).with(:get, "core_url", {:page => 2, :per_page=>50}, {"Accept-Version" => "v2"}).and_return(second_req)
   end
 
   context 'GET calls' do
@@ -28,6 +31,7 @@ describe Whiplash::App::Connections do
         puts res
         puts res.body
         puts res.status
+        binding.pry
         expect(res.body.class).to eq(Array)
       end
 
