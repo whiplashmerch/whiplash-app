@@ -92,7 +92,7 @@ module Whiplash
           break if partial_results_request.body.size < PER_PAGE_REQUEST_LIMIT
         end
 
-        response ||= Faraday::Response.new(
+        Faraday::Response.new(
           body: results,
           status: 200,
           method: :get,
