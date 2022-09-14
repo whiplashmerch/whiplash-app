@@ -24,6 +24,7 @@ describe Whiplash::App::Connections do
 
       it 'returns an array in the body' do
         res = whiplash_app.multi_page_get!('core_url', {}, nil)
+        puts res.body
         expect(res.body.class).to eq(Array)
       end
 
