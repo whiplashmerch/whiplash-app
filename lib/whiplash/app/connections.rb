@@ -92,17 +92,12 @@ module Whiplash
           break if partial_results_request.body.size < PER_PAGE_REQUEST_LIMIT
         end
 
-        # puts results
-
         response ||= Faraday::Response.new(
           body: results,
           status: 200,
           method: :get
         )
 
-        # puts response.body
-
-        # response
       end
 
       def delete(endpoint, params = {}, headers = nil)
