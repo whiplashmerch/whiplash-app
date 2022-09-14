@@ -18,12 +18,11 @@ describe Whiplash::App::Connections do
       end
 
       it 'returns an array in the body' do
-        puts whiplash_app.multi_page_get!('core_url', {}, nil)
-        expect(whiplash_app.multi_page_get!('core_url', {}, nil).body.class).to equal Array
+        expect(whiplash_app.multi_page_get!('core_url', {}, nil).body.class).to eq(Array)
       end
 
       it 'returns the correct numbers of results' do
-          expect(whiplash_app.multi_page_get!('core_url', {}, nil).body.size).to equal 60
+          expect(whiplash_app.multi_page_get!('core_url', {}, nil).body.size).to eq(60)
       end
     end
   end
