@@ -84,6 +84,7 @@ module Whiplash
 
           results << partial_results_request.body
           results.flatten!
+          puts results
 
           page += 1
           params[:page] = page
@@ -92,7 +93,7 @@ module Whiplash
           break if partial_results_request.body.size < PER_PAGE_REQUEST_LIMIT
         end
 
-        Faraday::Response.new(
+        response ||= Faraday::Response.new(
           body: results,
           status: 200,
           method: :get,
