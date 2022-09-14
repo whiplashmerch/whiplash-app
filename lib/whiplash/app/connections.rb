@@ -97,7 +97,7 @@ module Whiplash
         response ||= Faraday::Response.new(
           body: results,
           status: 200,
-          method: :get,
+          method: :get
         )
 
         # puts response.body

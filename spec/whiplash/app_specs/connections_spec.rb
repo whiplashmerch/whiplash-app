@@ -28,7 +28,7 @@ describe Whiplash::App::Connections do
         # puts res
         # puts res.body
         # puts res.status
-        puts res.to_json
+        # binding.pry
         expect(res.body.class).to eq(Array)
       end
 
