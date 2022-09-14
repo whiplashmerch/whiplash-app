@@ -28,9 +28,7 @@ describe Whiplash::App::Connections do
         # puts res
         # puts res.body
         # puts res.status
-        puts 'checking per page limit'
-        puts PER_PAGE_REQUEST_LIMIT
-        binding.pry
+        puts res.to_json
         expect(res.body.class).to eq(Array)
       end
 

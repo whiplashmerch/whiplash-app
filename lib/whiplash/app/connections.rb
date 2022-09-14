@@ -100,9 +100,9 @@ module Whiplash
           method: :get,
         )
 
-        puts response.body
+        # puts response.body
 
-        response
+        # response
       end
 
       def delete(endpoint, params = {}, headers = nil)
