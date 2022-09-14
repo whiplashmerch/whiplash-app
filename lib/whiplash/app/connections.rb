@@ -84,7 +84,6 @@ module Whiplash
 
           results << partial_results_request.body
           results.flatten!
-          # puts results
 
           page += 1
           params[:page] = page
