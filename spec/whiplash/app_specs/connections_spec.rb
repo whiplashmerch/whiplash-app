@@ -18,13 +18,15 @@ describe Whiplash::App::Connections do
       end
 
       it 'returns a successful response' do
-        res = whiplash_app.multi_page_get!('core_url', {}, nil) 
+        res = whiplash_app.multi_page_get!('core_url', {}, nil)
+        pp res
         expect(res.status).to eq(200)
       end
 
       # Faraday is losing the response.body in travis but it works locally
       it 'returns an array in the body' do
         res = whiplash_app.multi_page_get!('core_url', {}, nil)
+        pp res
         expect(res.body.class).to eq(Array)
       end
 
