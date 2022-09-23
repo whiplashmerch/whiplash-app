@@ -13,12 +13,23 @@ describe Whiplash::App::Connections do
 
   context 'GET calls' do
     describe '#multi_page_get!' do
-      it 'returns an array' do
-          expect(whiplash_app.multi_page_get!('core_url', {}, nil).class).to equal Array
+      it 'returns a Faraday response' do
+          expect(whiplash_app.multi_page_get!('core_url', {}, nil).class).to equal Faraday::Response
+      end
+
+      it 'returns a successful response' do
+        res = whiplash_app.multi_page_get!('core_url', {}, nil)
+        expect(res.status).to eq(200)
+      end
+
+      it 'returns an array in the body' do
+        res = whiplash_app.multi_page_get!('core_url', {}, nil)
+        expect(res.env.request_body.class).to eq(Array)
       end
 
       it 'returns the correct numbers of results' do
-          expect(whiplash_app.multi_page_get!('core_url', {}, nil).size).to equal 60
+        res = whiplash_app.multi_page_get!('core_url', {}, nil)
+        expect(res.env.request_body.size).to eq(60)
       end
     end
   end
