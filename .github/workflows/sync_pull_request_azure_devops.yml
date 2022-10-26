@@ -1,0 +1,23 @@
+name: Sync Pull Request to Azure Boards
+
+on:
+  pull_request_target:
+    types: [opened, edited, closed]
+    branches:
+      - master
+          
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: Ryder-System/GitHub-PR@master
+      env:
+        ado_token: "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}"
+        github_token: "${{ secrets.ORG_SCOPED_GITHUB_TOKEN }}"  
+        ado_organization: "ryderscs"
+        ado_project: "Ecommerce Customer Experience"
+        ado_wit: "Pull Request"
+        ado_new_state: "To Do"
+        ado_close_state: 'Done'
+        default_ado_wi_parent_url : "https://dev.azure.com/ryderscs/Ecommerce%20Customer%20Experience/_workitems/edit/69563"
+        debug: true
