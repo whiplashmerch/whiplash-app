@@ -1,0 +1,43 @@
+name: Sync issue to Azure DevOps work item
+
+on:
+  issues:
+    types:
+      [opened, edited, deleted, closed, reopened, assigned]
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: Configuration for bug
+        if: ${{ contains(github.event.issue.labels.*.name, 'bug') == true || contains(github.event.issue.labels.*.name, 'qa bug') == true }}
+        uses: Ryder-System/ADO-Integration@master
+        env:
+          ado_token: "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}"
+          github_token: "${{ secrets.ORG_SCOPED_GITHUB_TOKEN }}"
+          ado_organization: "ryderscs"
+          ado_project: "Ecommerce Customer Experience"
+          ado_wit: "Bug"
+          ado_new_state: "To Do"
+          #ado_active_state: "In Progress"
+          ado_close_state: "Done"
+          ado_bypassrules: true
+          log_level: 300
+          default_ado_wi_parent_url : "https://dev.azure.com/ryderscs/Ecommerce%20Customer%20Experience/_workitems/edit/60783"
+          
+      - name: Configuration for task
+        if: ${{ contains(github.event.issue.labels.*.name, 'bug') == false && contains(github.event.issue.labels.*.name, 'qa bug') == false }}
+        uses: Ryder-System/ADO-Integration@master
+        env:
+          ado_token: "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}"
+          github_token: "${{ secrets.ORG_SCOPED_GITHUB_TOKEN }}"
+          ado_organization: "ryderscs"
+          ado_project: "Ecommerce Customer Experience"
+          ado_wit: "Task"
+          ado_new_state: "To Do"
+          #ado_active_state: "In Progress"
+          ado_close_state: "Done"
+          ado_bypassrules: true
+          log_level: 300
+          default_ado_wi_parent_url : "https://dev.azure.com/ryderscs/Ecommerce%20Customer%20Experience/_workitems/edit/60783"
