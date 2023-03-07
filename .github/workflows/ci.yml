@@ -1,7 +1,7 @@
 name: "Whiplash App CI Workflow"
 on:
   pull_request_target:
-    types: [opened]
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
   
 jobs:
@@ -17,6 +17,10 @@ jobs:
         with:
           ruby-version: '2.6.7'
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          
+      - run: gem install bundler -v 2.2.25
+      
+      - run: bundle exec rake
         
       - name: Slack Notification
         uses: 8398a7/action-slack@v3
