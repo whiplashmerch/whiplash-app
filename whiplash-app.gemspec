@@ -19,8 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "oauth2", "~> 2.0.4"
-  spec.add_dependency "faraday_middleware", "~> 1.2.0"
-  spec.add_dependency "moneta", "~> 0.8.0"
+  spec.add_dependency "faraday", "~> 2.7"
 
   spec.add_development_dependency "bundler", ">= 2.2"
   spec.add_development_dependency "rake", ">= 12.3.3"
