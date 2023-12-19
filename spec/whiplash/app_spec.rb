@@ -3,7 +3,7 @@ require "spec_helper"
 describe Whiplash::App do
   before do
     allow_any_instance_of(Whiplash::App).to receive(:token).and_return(double(token: 'access token'))
-    @whiplash_app = Whiplash::App.new
+    @whiplash_app = Whiplash::App.new(token: {access_token: 'access token'})
   end
 
   it "has a version number" do

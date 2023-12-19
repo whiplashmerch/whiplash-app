@@ -3,7 +3,7 @@ require "spec_helper"
 describe Whiplash::App::Connections do
   let(:first_request) { OpenStruct.new(success?: true, body: (1..50).to_a) }
   let(:second_request) { OpenStruct.new(success?: true, body: (1..10).to_a) }
-  let(:whiplash_app) { Whiplash::App.new }
+  let(:whiplash_app) { Whiplash::App.new(token: {access_token: 'access token'}) }
 
   before do
     allow_any_instance_of(Whiplash::App).to receive(:token).and_return(double(token: 'access token'))
