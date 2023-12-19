@@ -78,3 +78,24 @@ module Whiplash
 
   end
 end
+
+module Net
+  class HTTPResponse
+    class << self
+      private
+
+      def read_status_line(sock)
+        str = sock.readline
+        og = str.dup
+        str.gsub!(/.*?(?=HTTP)/im, "")
+        if og.size > str.size
+          Rails.logger.warn "[WhiplashApp] Failed to read header status for #{og.inspect}"
+        end
+        m = /\AHTTP(?:\/(\d+\.\d+))?\s+(\d\d\d)(?:\s+(.*))?\z/in.match(str) or
+          raise Net::HTTPBadResponse, "wrong status line: #{str.dump}"
+        m.captures
+      end
+
+    end
+  end
+end
