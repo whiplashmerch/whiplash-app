@@ -45,16 +45,16 @@ module Whiplash
           case e.message
           when 'end of file reached'
             store_whiplash_error!(:eof, options)
-            Rails.logger.error "[Whiplash][EOF] Failed to connect to #{url}"
-            raise ProviderError::InternalServerError, e.message
+            Rails.logger.error "[Whiplash][EOF] Failed to connect with options: #{options.inspect}"
+            raise WhiplashApiError::InternalServerError, e.message
           when 'Net::OpenTimeout'
             store_whiplash_error!(:timeout, options)
-            Rails.logger.error "[Whiplash][Timeout] Request to #{url} timed out"
-            raise ProviderError::Timeout, e.message
+            Rails.logger.error "[Whiplash][Timeout] Request with options: #{options.inspect} timed out"
+            raise WhiplashApiError::Timeout, e.message
           else
             store_whiplash_error!(:connection, options)
-            Rails.logger.error "[Whiplash] Request to #{url} failed"
-            raise ProviderError::InternalServerError, e.message
+            Rails.logger.error "[Whiplash] Request with options: #{options.inspect} failed"
+            raise WhiplashApiError::InternalServerError, e.message
           end
         end
       end
@@ -161,7 +161,8 @@ module Whiplash
         if !response.success?
           case response.status
           when 500
-            Appsignal.send_error(WhiplashApiError::InternalServerError.new(response.body), {raised: false})
+            # Do we want to replace this with anything?
+            # Appsignal.send_error(WhiplashApiError::InternalServerError.new(response.body), {raised: false})
           else
           end
 
