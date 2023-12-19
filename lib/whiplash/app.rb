@@ -1,35 +1,26 @@
 require "whiplash/app/api_config"
-require "whiplash/app/caching"
 require "whiplash/app/connections"
 require "whiplash/app/finder_methods"
 require "whiplash/app/signing"
 require "whiplash/app/version"
 require "errors/whiplash_api_error"
 require "oauth2"
-require "faraday_middleware"
+require "faraday"
 
 module Whiplash
   class App
     include Whiplash::App::ApiConfig
-    include Whiplash::App::Caching
     include Whiplash::App::Connections
     include Whiplash::App::FinderMethods
     extend Whiplash::App::Signing
 
     attr_accessor :customer_id, :shop_id, :token
 
-    def initialize(token=nil, options={})
-      token ||= cache_store["whiplash_api_token"]
-      @token = format_token(token) unless token.nil?
+    def initialize(token, options={})
+      @token = format_token(token)
       @customer_id = options[:customer_id]
       @shop_id = options[:shop_id]
       @api_version = options[:api_version] || 2 # can be 2_1
-    end
-
-    def self.whiplash_api_token
-      store = Moneta.new(:Redis, host: ENV["REDIS_HOST"], port: ENV["REDIS_PORT"], password: ENV["REDIS_PASSWORD"], expires: 7200)
-      cache_store = Moneta::Namespace.new store, Whiplash::App::Caching.namespace_value
-      cache_store["whiplash_api_token"]
     end
 
     def client
@@ -41,14 +32,11 @@ module Whiplash
     end
 
     def connection
-      out = Faraday.new [api_url, versioned_api_url].join("/") do |conn|
-        conn.request :oauth2, token.token, token_type: "bearer"
+      Faraday.new [api_url, versioned_api_url].join("/") do |conn|
+        conn.request :authorization, 'Bearer', token.token
         conn.request :json
         conn.response :json, :content_type => /\bjson$/
-        conn.use :instrumentation
-        conn.adapter Faraday.default_adapter
       end
-      return out
     end
 
     def token=(oauth_token)
@@ -60,8 +48,6 @@ module Whiplash
       when /app_(manage|read)/
         begin
           access_token = client.client_credentials.get_token(scope: ENV["WHIPLASH_CLIENT_SCOPE"])
-          new_token = access_token.to_hash
-          cache_store["whiplash_api_token"] = new_token
         rescue URI::InvalidURIError => e
           raise StandardError, "The provide URL (#{ENV["WHIPLASH_API_URL"]}) is not valid"
         end
@@ -75,9 +61,6 @@ module Whiplash
 
     def token_expired?
       return token.expired? unless token.nil?
-      return true unless cache_store.key?("whiplash_api_token")
-      return true if cache_store["whiplash_api_token"].nil?
-      return true if cache_store["whiplash_api_token"].empty?
       false
     end
 
