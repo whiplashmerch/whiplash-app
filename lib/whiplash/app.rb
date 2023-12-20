@@ -7,6 +7,12 @@ require "errors/whiplash_api_error"
 require "oauth2"
 require "faraday"
 
+# Rails app stuff
+if defined?(Rails::Railtie)
+  require "whiplash/app/canonical_host" 
+  require "whiplash/app/railtie"
+end 
+
 module Whiplash
   class App
     include Whiplash::App::ApiConfig
