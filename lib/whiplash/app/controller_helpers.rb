@@ -65,7 +65,7 @@ module Whiplash
         fields_we_care_about = %w(id email role locale first_name last_name partner_id warehouse_id customer_ids)
         user_hash = user.slice(*fields_we_care_about)
         expires_at ||= user['current_sign_in_expires_at']
-# binding.pry
+
         shared_values = {
           expires: DateTime.parse(expires_at),
           secure: http_scheme == 'https',
