@@ -9,8 +9,9 @@ require "faraday"
 
 # Rails app stuff
 if defined?(Rails::Railtie)
-  require "whiplash/app/canonical_host" 
   require "whiplash/app/railtie"
+  require "whiplash/app/canonical_host" 
+  require "whiplash/app/controller_helpers"
 end 
 
 module Whiplash
@@ -31,6 +32,10 @@ module Whiplash
 
     def versioned_api_url
       "api/v#{@api_version}"
+    end
+
+    def client
+      OAuth2::Client.new(ENV["WHIPLASH_CLIENT_ID"], ENV["WHIPLASH_CLIENT_SECRET"], site: self.class.api_url)
     end
 
     def connection
