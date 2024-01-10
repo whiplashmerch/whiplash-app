@@ -9,16 +9,17 @@ require "faraday"
 
 # Rails app stuff
 if defined?(Rails::Railtie)
-  require "whiplash/app/canonical_host" 
   require "whiplash/app/railtie"
+  require "whiplash/app/canonical_host" 
+  require "whiplash/app/controller_helpers"
 end 
 
 module Whiplash
   class App
-    include Whiplash::App::ApiConfig
+    extend Whiplash::App::Signing
+    extend Whiplash::App::ApiConfig
     include Whiplash::App::Connections
     include Whiplash::App::FinderMethods
-    extend Whiplash::App::Signing
 
     attr_accessor :customer_id, :shop_id, :token
 
@@ -29,16 +30,16 @@ module Whiplash
       @api_version = options[:api_version] || 2 # can be 2_1
     end
 
-    def client
-      OAuth2::Client.new(ENV["WHIPLASH_CLIENT_ID"], ENV["WHIPLASH_CLIENT_SECRET"], site: api_url)
-    end
-
     def versioned_api_url
       "api/v#{@api_version}"
     end
 
+    def client
+      OAuth2::Client.new(ENV["WHIPLASH_CLIENT_ID"], ENV["WHIPLASH_CLIENT_SECRET"], site: self.class.api_url)
+    end
+
     def connection
-      Faraday.new [api_url, versioned_api_url].join("/") do |conn|
+      Faraday.new [self.class.api_url, versioned_api_url].join("/") do |conn|
         conn.request :authorization, 'Bearer', token.token
         conn.request :json
         conn.response :json, :content_type => /\bjson$/
@@ -53,9 +54,9 @@ module Whiplash
       case ENV["WHIPLASH_CLIENT_SCOPE"]
       when /app_(manage|read)/
         begin
-          access_token = client.client_credentials.get_token(scope: ENV["WHIPLASH_CLIENT_SCOPE"])
+          access_token = self.class.client_credentials_token
         rescue URI::InvalidURIError => e
-          raise StandardError, "The provide URL (#{ENV["WHIPLASH_API_URL"]}) is not valid"
+          raise StandardError, "The provided URL (#{ENV["WHIPLASH_API_URL"]}) is not valid"
         end
       else
         raise StandardError, "You must request an access token before you can refresh it" if token.nil?
@@ -68,6 +69,13 @@ module Whiplash
     def token_expired?
       return token.expired? unless token.nil?
       false
+    end
+
+    class << self 
+      def client_credentials_token
+        client = OAuth2::Client.new(ENV["WHIPLASH_CLIENT_ID"], ENV["WHIPLASH_CLIENT_SECRET"], site: api_url)
+        client.client_credentials.get_token(scope: ENV["WHIPLASH_CLIENT_SCOPE"])
+      end
     end
 
     private

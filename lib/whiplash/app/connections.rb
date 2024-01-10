@@ -27,7 +27,7 @@ module Whiplash
 
       def app_request(options={})
         return base_app_request(options) unless defined?(Sidekiq)
-        limiter = Sidekiq::Limiter.window('whiplash-core', self.rate_limit, :second, wait_timeout: 15)
+        limiter = Sidekiq::Limiter.window('whiplash-core', self.class.rate_limit, :second, wait_timeout: 15)
         limiter.within_limit do
           base_app_request(options)
         end

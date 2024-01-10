@@ -10,16 +10,18 @@ module Whiplash
         end
       end
 
+      def rate_limit
+        (ENV['WHIPLASH_RATE_LIMIT'] || 25).to_i
+      end
+
+      private
+      
       def production_url
         ENV["WHIPLASH_API_URL"] || "https://www.getwhiplash.com"
       end
 
       def testing_url
         ENV["WHIPLASH_API_URL"] || "https://sandbox.getwhiplash.com"
-      end
-
-      def rate_limit
-        (ENV['WHIPLASH_RATE_LIMIT'] || 25).to_i
       end
 
     end
