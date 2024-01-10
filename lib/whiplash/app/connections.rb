@@ -10,7 +10,6 @@ module Whiplash
         else
           endpoint = options[:endpoint]
         end
-        options[:params].merge!(withCredentials: true,)
         options[:headers] ||= {}
         options[:headers][:customer_id] ||= customer_id if customer_id
         options[:headers][:shop_id] ||= shop_id if shop_id

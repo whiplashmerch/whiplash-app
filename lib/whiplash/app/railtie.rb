@@ -12,7 +12,9 @@ module Whiplash
         app.config.application_name_space = [config.application_key, config.environment_key].join('-')
     
         # session settings
-        session_length = ENV.fetch('SESSION_LENGTH', 30.days.to_i).to_i
+        session_days = 30 
+        session_seconds = session_days * 24 * 60 * 60
+        session_length = ENV.fetch('SESSION_LENGTH', session_seconds).to_i
         app.config.session_length = session_length
         app.config.session_store :cookie_store, :key => '_session', :expire_after => session_length
       end
