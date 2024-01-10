@@ -4,6 +4,8 @@ The whiplash-app gem allows your Whiplash application to access the Whiplash
 API and perform authentication, signatures and signature verification, and basic
 CRUD functions against the api.
 
+For apps that provide a UI, it also provides built in authentication and several helper methods.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -22,115 +24,105 @@ Or install it yourself as:
 
 ## Usage
 
-**NOTE: 0.4.0 introduces a breaking change and is NOT backward compatible with previous versions.**
+There are two basic uses for this gem:
+1. Authenticating users for apps _with a UI_ (i.e. Notifications, Troubleshoot, etc)
+2. Providing offline access to applications that perform tasks (i.e Tasks, Old Integrations, etc)
 
-To upgrade from < 0.4.0, you need to make two small changes:
-1. `Whiplash::App` must now be instantiated.
-2. Tokens are **not** automatically refreshed
+It's not uncommon for an application to do _both_ of the above (i.e. Notifications, Payments, etc)
 
-Before:
-```ruby
-api = Whiplash::App
-```
-
-After:
-```ruby
-api = Whiplash::App.new
-api.refresh_token! # Since you don't have one yet
-api.token # Confirm you've got a token
-. . .
-api.refresh_token! if api.token_expired?
-```
-
-### Authentication
+### Authentication for offline access (Oauth Client Credentials flow)
 In order to authenticate, make sure the following `ENV` vars are set:
 
 ```ruby
-ENV["WHIPLASH_CLIENT_ID"]
-ENV["WHIPLASH_CLIENT_SECRET"]
-ENV["WHIPLASH_CLIENT_SCOPE"]
+ENV['WHIPLASH_API_URL']
+ENV['WHIPLASH_CLIENT_ID']
+ENV['WHIPLASH_CLIENT_SCOPE']
+ENV['WHIPLASH_CLIENT_SECRET']
 ```
 
-Once those are set, authentication is handled in app.
-
-### Oauth Client Credentials
-You can authenticate using Oauth Client Credentials (i.e. auth an entire app).
-You probably want this for apps that work offline, _on behalf_ of users or customers, or that don't work at the user/customer-level at all.
+Once those are set, you can generate and use an access token like so:
 
 ```ruby
-api = Whiplash::App.new
-api.refresh_token! # Since you don't have one yet
-api.token # Confirm you've got a token
+token = Whiplash::App.client_credentials_token
+api = Whiplash::App.new(token)
+customers = api.get!('customers')
 ```
 
-### Oauth Authorization Code
-You can also authenticate using Oauth Authorization Code (i.e. auth an individual user). This is most common for user-facing app's with a front end.
+### Authentication for online access
+In order to use the API, you only need to set the following:
 
 ```ruby
-# Authenticate using Devise Omniauthenticateable strategy; you'll get oauth creds back as a hash
-api = Whiplash::App.new(oauth_credentials_hash)
-api.token # Confirm you've got a token
+ENV['WHIPLASH_API_URL']
 ```
 
-### API URL
-In order to set your api url, you can use the following environment URL:
+As long as all of your apps are on the same subdomain, they will share auth cookies:
+
+```json
+{
+    "oauth_token": XXXXXXX,
+    "user": {"id":151,"email":"mark@getwhiplash.com","role":"admin","locale":"en","first_name":"Mark","last_name":"Dickson","partner_id":null,"warehouse_id": 1,"customer_ids":[1, 2, 3]}
+}
 ```
-ENV["WHIPLASH_API_URL"]
-```
-If it isn't set, then the API URL defaults to either `https://sandbox.getwhiplash.com` (test or dev environment) or `https://www.getwhiplash.com` (prod environment).
+
+You get a variety of helper methods for free:
+
+`init_whiplash_api` - This instantiates `@whiplash_api` which can be used to make requests, out of the box
+`current_user` - This is a **hash** with the above fields; you typically shouldn't need much more user info than this
+`require_user` - Typically you'd use this in a `before_action`. You almost always want this in `ApplicationController`.
+`set_locale!` - Sets the locale based on the value in the user hash
+`set_current_user_cookie!` - Updates the current user cookie with fresh data from the api. You typically won't need this, unless your app updates fields like `warehouse_id` or `locale`.
+`core_url` - Shorthand for `ENV['WHIPLASH_API_URL']`
+`core_url_for` - Link back to Core like `core_url_for('login')`
+
 
 ### Sending Customer ID and Shop ID headers
 You can send the headers in `headers` array, like `{customer_id: 123, shop_id: 111}`.
-Alternatively, you can set them on instantiation like `Whiplash::App.new(token, {customer_id: 123, shop_id: 111})`.
+Alternatively, you can set them on instantiation like `Whiplash::App.new(token, {customer_id: 123, shop_id: 111})`
 
-### Rails AR type calls
-
-In order to make the use of the gem seem more "AR-ish", we've added AR oriented methods that can be used for basic object creation/deletion/updating/viewing. The basic gist of these AR style CRUD methods is that they will all follow the same pattern.  If you are performing a collection action, such as `create` or `find`, the pattern is this:
-
-```ruby
-api.create(resource, params, headers)
-```
-
-For member actions, such as `show`, or `destroy` methods, the pattern is this:
-
-```ruby
-api.find(resource, id, headers)
-api.destroy(resource, id, headers)
-```
-
-Finally, for `update` calls, it's a mixture of those:
-
-```ruby
-api.update(resource, id, params_to_update, headers)
-```
-
-So, basic AR style calls can be performed like so:
-
-```ruby
-api.find_all('orders', {}, { customer_id: 187 })
-api.find('orders', 1)
-api.create('orders', { key: "value", key2: "value" }, { customer_id: 187 } )
-api.update('orders', 1, { key: "value"}, { customer_id: 187 } )
-api.destroy('orders', 1, { customer_id: 187 } )
-api.count('customers')
-```
 
 ### CRUD Wrapper methods
-In reality, all of these methods are simply wrapper methods around simple `GET/POST/PUT/DELETE` wrappers on Faraday, so if you want to get more granular,you can also make calls that simply reference the lower level REST verb:
 
 ```ruby
 api.get('orders')
 ```
-Which will return all orders and roughly correspond to an index call. If you need to use `Whiplash::App` for nonRESTful calls, simply drop the full endpoint in as your first argument:
 
-```ruby
-api.get('orders/non_restful_action', {}, {})
 ```
 `POST`, `PUT`, and `DELETE` calls can be performed in much the same way:
 ```ruby
 api.post(endpoint, params, headers) # POST request to the specified endpoint passing the payload in params
 api.put(endpoint, params, headers) # PUT request to the specified endpoint passing the payload in params
 api.delete(endpoint, params, headers) # DELETE request to the specified endpoint.  Params would probably just be an id.
+```
+
+### Bang methods
+
+In typical Rails/Ruby fashion, `!` methods `raise`. Typically, you'll want to set some global `rescue`s and use the `!` version of crud requests:
+
+```ruby
+rescue_from WhiplashApiError, with: :handle_whiplash_api_error
+
+def handle_whiplash_api_error(exception)
+    # Any special exceptions we want to handle directly
+    case exception.class.to_s
+    when 'WhiplashApiError::Unauthorized'
+      return redirect_to core_url_for('logout')
+    end
+    
+    @status_code = WhiplashApiError.codes&.invert&.dig(exception&.class)
+    @error = exception.message
+    respond_to do |format|
+      format.html {
+        flash[:error] = @error
+        redirect_back(fallback_location: root_path)
+      }
+      format.json {
+        render json: exception, status: @status_code
+      }
+      format.js {
+        render template: 'resources/exception'
+      }
+    end
+end
 ```
 
 ### Signing and Verifying.
@@ -142,30 +134,6 @@ and verifications are done like so:
 ```ruby
 Whiplash::App.verified?(request)
 ```  
-
-### Caching
-`whiplash-app` is Cache agnostic, relying on the `moneta` gem to provide a local store, if needed.  
-However, if you intend to specify `REDIS` as your key-value store of choice, it's dead simple.  Simply declare the following variables:
-```
-ENV["REDIS_HOST"]
-ENV["REDIS_PORT"]
-ENV["REDIS_PASSWORD"]
-ENV["REDIS_NAMESPACE"]
-```
-If those are provided, `moneta` will use your redis connection and will namespace your cache storage under the redis namespace.  By default, if you do not declare a `REDIS_NAMESPACE` value, the app will default to the `WHIPLASH_CLIENT_ID`.
-
-**For user-facing apps, best practice is to store the `oauth_credentials_hash` in a session variable.**
-
-### Gotchas
-Due to the way Faraday handles params, this would not, as expected, route to `orders#show` in the Whiplash App, but would instead route to `orders#index`, so it wouldn't return the expected singular order with an ID of 1, but all orders for that customer.
-```ruby
-api.get('orders', {id: 1}, {customer_id: 187})  
-```
-Instead, you'd want to do:
-```ruby
-api.get('orders/1', {}, {customer_id: 187})  
-```
-
 
 ## Development
 
