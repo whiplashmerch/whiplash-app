@@ -59,6 +59,21 @@ module Whiplash
         I18n.locale = current_user.try('locale') || I18n.default_locale
       end
 
+      def set_current_customer_cookie!(customer_id, expires_at = nil)
+        customer = @whiplash_api.get!("customers/#{customer_id}").body
+        user = @whiplash_api.get!("me").body
+        fields_we_care_about = %w(id name)
+        customer_hash = customer.slice(*fields_we_care_about)
+        expires_at ||= user['current_sign_in_expires_at']
+
+        shared_values = {
+          expires: DateTime.parse(expires_at),
+          secure: http_scheme == 'https',
+          samesite: :strict,
+          domain: cookie_domain
+        }
+        cookies[:customer] = shared_values.merge(value: customer_hash.to_json)
+      end
 
       def set_current_user_cookie!(expires_at = nil)
         user = @whiplash_api.get!("me").body
@@ -73,6 +88,22 @@ module Whiplash
           domain: cookie_domain
         }
         cookies[:user] = shared_values.merge(value: user_hash.to_json)
+      end
+
+      def set_current_warehouse_cookie!(warehouse_id, expires_at = nil)
+        warehouse = @whiplash_api.get!("warehouses/#{warehouse_id}").body
+        user = @whiplash_api.get!("me").body
+        fields_we_care_about = %w(id name)
+        warehouse_hash = warehouse.slice(*fields_we_care_about)
+        expires_at ||= user['current_sign_in_expires_at']
+
+        shared_values = {
+          expires: DateTime.parse(expires_at),
+          secure: http_scheme == 'https',
+          samesite: :strict,
+          domain: cookie_domain
+        }
+        cookies[:warehouse] = shared_values.merge(value: warehouse_hash.to_json)
       end
 
     end
