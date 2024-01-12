@@ -59,18 +59,26 @@ As long as all of your apps are on the same subdomain, they will share auth cook
 
 ```json
 {
-    "oauth_token": XXXXXXX,
-    "user": {"id":151,"email":"mark@getwhiplash.com","role":"admin","locale":"en","first_name":"Mark","last_name":"Dickson","partner_id":null,"warehouse_id": 1,"customer_ids":[1, 2, 3]}
+    "oauth_token": "XXXXXXX",
+    "user": {"id":151,"email":"mark@getwhiplash.com","role":"admin","locale":"en","first_name":"Mark","last_name":"Dickson","partner_id":null, "customer_ids":[1, 2, 3]},
+    "customer": {"id": 123, "name": "BooYaa"},
+    "warehouse": {"id": 1, "name": "Ann Arbor"}
 }
 ```
 
 You get a variety of helper methods for free:
 
 `init_whiplash_api` - This instantiates `@whiplash_api` which can be used to make requests, out of the box
-`current_user` - This is a **hash** with the above fields; you typically shouldn't need much more user info than this
+`current_user` - This is a **hash** with the above fields; you typically shouldn't need much more user info than this'
+`current_customer` - This is a **hash** with the above fields; you typically shouldn't need much more user info than this
+`current_warehouse` - This is a **hash** with the above fields; you typically shouldn't need much more user info than this
 `require_user` - Typically you'd use this in a `before_action`. You almost always want this in `ApplicationController`.
 `set_locale!` - Sets the locale based on the value in the user hash
-`set_current_user_cookie!` - Updates the current user cookie with fresh data from the api. You typically won't need this, unless your app updates fields like `warehouse_id` or `locale`.
+`set_current_user_cookie!` - Updates the current user cookie with fresh data from the api. You typically won't need this, unless your app updates fields like `locale`.
+`set_current_customer_cookie!` - Updates the current customer cookie with fresh data from the api; typically used after you've changed customer
+`set_current_warehouse_cookie!` - Updates the current customer cookie with fresh data from the api; typically used after you've changed warehouse
+`unset_current_customer_cookie!` - Deletes the current customer cookie, with appropriate domain settings
+`unset_current_warehouse_cookie!` - Deletes the current warehouse cookie, with appropriate domain settings
 `core_url` - Shorthand for `ENV['WHIPLASH_API_URL']`
 `core_url_for` - Link back to Core like `core_url_for('login')`
 
