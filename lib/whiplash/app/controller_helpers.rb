@@ -20,7 +20,7 @@ module Whiplash
       end
 
       def core_url
-        ENV['WHIPLASH_API_URL']
+        ENV['WHIPLASH_CORE_URL'] || ENV['WHIPLASH_API_URL']
       end
 
       def core_url_for(path)
