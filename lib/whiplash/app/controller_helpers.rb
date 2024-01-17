@@ -23,8 +23,9 @@ module Whiplash
         ENV['WHIPLASH_CORE_URL'] || ENV['WHIPLASH_API_URL']
       end
 
-      def core_url_for(path)
-        [core_url, path].join('/')
+      def core_url_for(path, query_params = {})
+        out = [core_url, path].join('/')
+        out = [out, query_params.to_query].join('?') if query_params.present?
       end
 
       def current_customer
@@ -86,7 +87,7 @@ module Whiplash
       end
 
       def init_whiplash_api(options = {})
-        return redirect_to core_url_for('login') if cookies[:oauth_token].blank?
+        return redirect_to core_url_for('login', redirect_url: request.original_url) if cookies[:oauth_token].blank?
         token = {access_token: cookies[:oauth_token]}
         begin 
           @whiplash_api = Whiplash::App.new(token, options)
@@ -97,7 +98,7 @@ module Whiplash
       end
     
       def require_user
-        redirect_to core_url_for('login') if current_user.blank?
+        redirect_to core_url_for('login', redirect_url: request.original_url) if current_user.blank?
       end
     
       def set_locale!
