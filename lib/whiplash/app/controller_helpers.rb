@@ -26,6 +26,7 @@ module Whiplash
       def core_url_for(path, query_params = {})
         out = [core_url, path].join('/')
         out = [out, query_params.to_query].join('?') if query_params.present?
+        return out
       end
 
       def current_customer
