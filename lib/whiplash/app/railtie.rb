@@ -20,7 +20,7 @@ module Whiplash
       end
 
       initializer "whiplash_app.action_controller" do
-        ActiveSupport.on_load(:action_controller) do
+        ActiveSupport.on_load(:action_controller_base) do
           include Whiplash::App::CanonicalHost
           include Whiplash::App::ControllerHelpers
         end
