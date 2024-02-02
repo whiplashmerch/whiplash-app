@@ -5,12 +5,14 @@ module Whiplash
       extend ActiveSupport::Concern
 
       included do
-        helper_method :cookie_domain,
-                      :core_url,
-                      :core_url_for,
-                      :current_customer,
-                      :current_user,
-                      :current_warehouse
+        if defined?(:helper_method)
+          helper_method :cookie_domain,
+                        :core_url,
+                        :core_url_for,
+                        :current_customer,
+                        :current_user,
+                        :current_warehouse
+        end
       end 
 
       private
