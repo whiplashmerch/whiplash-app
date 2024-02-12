@@ -16,7 +16,9 @@ module Whiplash
       private
 
       def cookie_domain
-        '.' + URI.parse(core_url).host
+        host = URI.parse(core_url).host
+        host.gsub!('www.', '')
+        '.' + host
       end
 
       def core_url
