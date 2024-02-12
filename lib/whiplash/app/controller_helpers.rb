@@ -15,16 +15,49 @@ module Whiplash
 
       private
 
+      def application_domain
+        return nil if Rails.configuration.application_url.blank?
+        host = URI.parse(Rails.configuration.application_url).host
+        '.' + host
+      end
+
+      def clear_application_cookies!
+        return if application_domain.blank?
+        cookie_keys_we_care_about.each { |k| cookies.delete(k, domain: application_domain) }
+      end
+
+      def clear_domain_cookies!
+        cookie_keys_we_care_about.each { |k| cookies.delete(k, domain: cookie_domain) }
+      end
+
       def cookie_domain
-        '.' + URI.parse(core_url).host
+        host = URI.parse(core_url).host
+        host.gsub!('www.', '')
+        '.' + host
+      end
+
+      def cookie_keys_we_care_about
+        %i(
+            _session
+            customer
+            customer_id
+            oauth_token
+            partner_id 
+            user
+            user_id
+            warehouse
+            warehouse_id
+          )
       end
 
       def core_url
-        ENV['WHIPLASH_API_URL']
+        ENV['WHIPLASH_CORE_URL'] || ENV['WHIPLASH_API_URL']
       end
 
-      def core_url_for(path)
-        [core_url, path].join('/')
+      def core_url_for(path, query_params = {})
+        out = [core_url, path].join('/')
+        out = [out, query_params.to_query].join('?') if query_params.present?
+        return out
       end
 
       def current_customer
@@ -86,7 +119,10 @@ module Whiplash
       end
 
       def init_whiplash_api(options = {})
-        return redirect_to core_url_for('login') if cookies[:oauth_token].blank?
+        if cookies[:oauth_token].blank?
+          clear_application_cookies!
+          return redirect_to core_url_for('login', redirect_url: request.original_url)
+        end
         token = {access_token: cookies[:oauth_token]}
         begin 
           @whiplash_api = Whiplash::App.new(token, options)
@@ -97,7 +133,9 @@ module Whiplash
       end
     
       def require_user
-        redirect_to core_url_for('login') if current_user.blank?
+        return if current_user.present?
+        clear_application_cookies!
+        redirect_to core_url_for('login', redirect_url: request.original_url) 
       end
     
       def set_locale!
