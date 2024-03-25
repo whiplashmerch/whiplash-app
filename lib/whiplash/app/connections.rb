@@ -1,6 +1,7 @@
 module Whiplash
   module App
     module Connections
+      PER_PAGE_REQUEST_LIMIT = 50
 
       def app_request(options = {})
         if options[:params][:id]
@@ -19,6 +20,32 @@ module Whiplash
                                  endpoint,
                                  options[:params],
                                  sanitize_headers(options[:headers]))
+      end
+
+      def multi_page_get!(endpoint, params = {}, headers = nil)
+        results = []
+        page = 1
+        params[:per_page] = PER_PAGE_REQUEST_LIMIT
+
+        loop do
+          partial_results_request = app_request!(
+            method: :get,
+            endpoint: endpoint,
+            params: params,
+            headers: headers
+          ).body
+
+          results << partial_results_request
+          results.flatten!
+
+          page += 1
+          params[:page] = page
+
+          break if partial_results_request.size == 0
+          break if partial_results_request.size < PER_PAGE_REQUEST_LIMIT
+        end
+
+        results
       end
 
       def delete(endpoint, params = {}, headers = nil, options = {})
