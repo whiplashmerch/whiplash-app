@@ -177,7 +177,7 @@ module Whiplash
       def set_current_warehouse_cookie!(warehouse_id, expires_at = nil)
         warehouse = @whiplash_api.get!("warehouses/#{warehouse_id}").body
         user = @whiplash_api.get!("me").body
-        fields_we_care_about = %w(id name)
+        fields_we_care_about = %w(id name slug)
         warehouse_hash = warehouse.slice(*fields_we_care_about)
         expires_at ||= user['current_sign_in_expires_at']
 
