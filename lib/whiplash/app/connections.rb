@@ -28,7 +28,7 @@ module Whiplash
         params[:per_page] = PER_PAGE_REQUEST_LIMIT
 
         loop do
-          partial_results_request = app_request!(
+          partial_results_request = app_request(
             method: :get,
             endpoint: endpoint,
             params: params,
