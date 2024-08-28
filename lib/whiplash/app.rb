@@ -5,7 +5,6 @@ require "whiplash/app/finder_methods"
 require "whiplash/app/signing"
 require "whiplash/app/version"
 require "oauth2"
-require 'faraday/oauth2'
 
 
 module Whiplash
@@ -26,7 +25,7 @@ module Whiplash
 
       def connection(version = "api/v2")
         out = Faraday.new(url: [api_url, version].join("/")) do |conn|
-          conn.request :oauth2, token, token_type: "bearer" # OAuth2 middleware
+          conn.request :authorization, 'Bearer', token
           conn.request :json # Automatically encode requests as JSON
           conn.response :json # Automatically parse responses as JSON
           conn.response :raise_error # Raise exceptions for 4xx and 5xx responses
