@@ -25,7 +25,7 @@ module Whiplash
       def multi_page_get!(endpoint, params = {}, headers = nil)
         results = []
         page = 1
-        params[:per_page] = PER_PAGE_REQUEST_LIMIT
+        params[:per_page] ||= PER_PAGE_REQUEST_LIMIT
         response = nil
 
         loop do
