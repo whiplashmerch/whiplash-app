@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "oauth2", "~> 2.0.4"
   spec.add_dependency "faraday", "~> 2.7"
+  spec.add_dependency 'net-http-persistent', '~> 4.0'
 
   spec.add_development_dependency "bundler", ">= 2.2"
   spec.add_development_dependency "rake", ">= 12.3.3"
