@@ -6,6 +6,7 @@ require "whiplash/app/version"
 require "errors/whiplash_api_error"
 require "oauth2"
 require "faraday"
+require 'faraday/net_http_persistent'
 
 # Rails app stuff
 if defined?(Rails::Railtie)
@@ -40,9 +41,21 @@ module Whiplash
 
     def connection
       Faraday.new [self.class.api_url, versioned_api_url].join("/") do |conn|
+        # Authentication
         conn.request :authorization, 'Bearer', token.token
         conn.request :json
         conn.response :json, :content_type => /\bjson$/
+        conn.options.timeout = 30 # Total request timeout
+        conn.options.open_timeout = 5 # Connection establishment timeout
+        
+        # Use persistent HTTP connections (requires net-http-persistent gem)
+        begin
+          conn.adapter :net_http_persistent
+        rescue LoadError
+          # Fallback to default adapter if net-http-persistent isn't available
+          Rails.logger.warn "[WhiplashApp] net-http-persistent gem not found, using default adapter" if defined?(Rails)
+          conn.adapter Faraday.default_adapter
+        end
       end
     end
 

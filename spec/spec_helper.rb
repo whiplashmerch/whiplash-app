@@ -4,5 +4,7 @@ ENV["WHIPLASH_CLIENT_SCOPE"] = "user_manage"
 ENV["WHIPLASH_API_URL"] = "https://qa.getwhiplash.com/"
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'bundler/setup'
 require 'whiplash/app'
+require 'ostruct'
 require "pry"
