@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "oauth2", "~> 1.2"
   spec.add_dependency "faraday", "~> 2.0"
   spec.add_dependency "moneta", "~> 1.0" # Updated to a more recent version if possible
+  spec.add_dependency 'faraday-net_http_persistent'
 
   spec.add_development_dependency "bundler", "~> 2.0"
   spec.add_development_dependency "rake", "~> 13.0"

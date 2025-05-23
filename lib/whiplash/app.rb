@@ -5,6 +5,8 @@ require "whiplash/app/finder_methods"
 require "whiplash/app/signing"
 require "whiplash/app/version"
 require "oauth2"
+require "faraday"
+require "faraday/net_http_persistent"
 
 
 module Whiplash
@@ -29,7 +31,15 @@ module Whiplash
           conn.request :json # Automatically encode requests as JSON
           conn.response :json # Automatically parse responses as JSON
           conn.response :raise_error # Raise exceptions for 4xx and 5xx responses
-          conn.adapter Faraday.default_adapter # Use the default adapter (Net::HTTP)
+          conn.options.timeout = 30 # Total request timeout
+          conn.options.open_timeout = 5 # Connection establishment timeout
+
+          begin
+            conn.adapter :net_http_persistent
+          rescue LoadError
+            Rails.logger.warn "[WhiplashApp] net-http-persistent gem not found, using default adapter" if defined?(Rails)
+            conn.adapter Faraday.default_adapter
+          end
         end
         return out
       end
