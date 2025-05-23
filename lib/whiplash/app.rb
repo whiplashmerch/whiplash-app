@@ -6,6 +6,7 @@ require "whiplash/app/version"
 require "errors/whiplash_api_error"
 require "oauth2"
 require "faraday"
+require 'faraday/net_http_persistent'
 
 # Rails app stuff
 if defined?(Rails::Railtie)
